@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" href="https://www.pngrepo.com/png/171107/170/compass.png" <!--my css-->
+    <link rel="stylesheet" href="./css/main.css">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
+        crossorigin="anonymous">
+
+    <title>NYU resindent searcher</title>
+</head>
+
+<body>
+    <div class="maincontainer">
+        <div class="controlbar">
+            <img src="http://www.stern.nyu.edu/sites/all/themes/stern/images/logo.nyu-stern.450.png" id="logo">
+            </img>
+            <form class="input-form">
+                <div class="form-group">
+                    <label for="customRange1">Example range</label>
+                    <input type="range" class="custom-range" id="customRange1" />
+                </div>
+                <div class="form-group">
+                    <label for="customRange1">Example range</label>
+                    <input type="range" class="custom-range" id="customRange1" />
+                </div>
+                <div class="form-group">
+                    <label for="customRange1">Example range</label>
+                    <input type="range" class="custom-range" id="customRange1" />
+                </div>
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="customSwitch1" />
+                    <label class="custom-control-label" for="customSwitch1">Toggle this switch element</label>
+                </div>
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="customSwitch1" />
+                    <label class="custom-control-label" for="customSwitch1">Toggle this switch element</label>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        <div class="infodisplay">
+            <div class="mapcontainer" id="googleMapContainer">
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <!--My own js-->
+    <script src="./js/main.js"></script>
+    <script src="./js/map.js"></script>
+    <!-- Google Maps -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwWYDB9v1MopiTtPpUXMDaCwAlOQbtn3c&callback=onGoogleMapResponse"></script>
+
+    <!--<script	src="./js/visualization.js"></script>-->
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

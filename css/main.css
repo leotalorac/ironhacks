@@ -1,0 +1,61 @@
+/*general styles*/
+.maincontainer{
+    height:100vh;
+    margin-right:0px;
+    margin-left:0px;
+    display:flex;
+  }
+  .controlbar{
+    height:100%;
+    background-color:#4f1875; 
+    color:white;
+    width:25%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:left;
+  }
+  #logo{
+    width:85%;
+    margin:2%;
+  }
+  .input-form{
+    width:90%;
+  }
+  .infodisplay{
+    width:75%;
+    height:100%;
+    overflow-y:scroll;
+  }
+  .mapcontainer{
+    width:100%;
+    height:100%;
+  }
+  
+  /* scrollbar */
+  /*taked from my git https://github.com/leotalorac/co2map/blob/master/css/main.css*/
+  /* width */
+  ::-webkit-scrollbar {
+      width: 10px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+      /* box-shadow: inset 0 0 5px grey;  */
+      /* border: solid black 0.5px; */
+      border-radius: 10px;
+  }
+  
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+      background: grey; 
+      border-radius: 15px;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+      background: #a5a5a5; 
+  }
+  
+  
+  
