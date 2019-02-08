@@ -5,7 +5,9 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="icon" href="https://www.pngrepo.com/png/171107/170/compass.png" <!--my css-->
+    <link rel="icon" href="https://www.pngrepo.com/png/171107/170/compass.png">
+    </link>
+    <!--my css-->
     <link rel="stylesheet" href="./css/main.css">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
@@ -21,30 +23,94 @@
             </img>
             <form class="input-form">
                 <div class="form-group">
-                    <label for="customRange1">Example range</label>
+                    <label for="customRange1">Risk</label>
                     <input type="range" class="custom-range" id="customRange1" />
                 </div>
                 <div class="form-group">
-                    <label for="customRange1">Example range</label>
+                    <label for="customRange1">Distance</label>
                     <input type="range" class="custom-range" id="customRange1" />
                 </div>
                 <div class="form-group">
-                    <label for="customRange1">Example range</label>
+                    <label for="customRange1">Affortable</label>
                     <input type="range" class="custom-range" id="customRange1" />
                 </div>
                 <div class="custom-control custom-switch">
                     <input type="checkbox" class="custom-control-input" id="customSwitch1" />
-                    <label class="custom-control-label" for="customSwitch1">Toggle this switch element</label>
+                    <label class="custom-control-label" for="customSwitch1">Show art galleries</label>
                 </div>
                 <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input" id="customSwitch1" />
-                    <label class="custom-control-label" for="customSwitch1">Toggle this switch element</label>
+                    <input type="checkbox" class="custom-control-input" id="customSwitch2" />
+                    <label class="custom-control-label" for="customSwitch2">Show farmer markers</label>
                 </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary">Show</button>
             </form>
+            <div class="footer">
+                <div class="instructions">
+
+                </div>
+                <p>Developed by @lotalorafox</p>
+                <span></span>
+            </div>
         </div>
         <div class="infodisplay">
             <div class="mapcontainer" id="googleMapContainer">
+            </div>
+            <button class="tablebutton btn btn-primary" id="tablebutton">Show table</button>
+            <button class="mapbutton btn btn-primary" id="mapbutton">Show map</button>
+            <div class="showdata" id="showdatadiv">
+                <div class="sub-showdata">
+
+                </div>
+                <div class="sub-showdata">
+                    <table class="table">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">District</th>
+                                <th scope="col">Points</th>
+                                <th scope="col">Watch on map</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row">1</th>
+                                <td>District 1</td>
+                                <td>5000</td>
+                                <td><button class="btn btn-primary">Click here</button></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">2</th>
+                                <td>District 2</td>
+                                <td>4200</td>
+                                <td><button class="btn btn-primary">Click here</button></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">3</th>
+                                <td>District 3</td>
+                                <td>4000</td>
+                                <td><button class="btn btn-primary">Click here</button></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">4</th>
+                                <td>District 4</td>
+                                <td>4000</td>
+                                <td><button class="btn btn-primary">Click here</button></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">5</th>
+                                <td>District 5</td>
+                                <td>4000</td>
+                                <td><button class="btn btn-primary">Click here</button></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">6</th>
+                                <td>District 6</td>
+                                <td>4000</td>
+                                <td><button class="btn btn-primary">Click here</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -52,6 +118,8 @@
 
 
 
+    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+        crossorigin="anonymous"></script>
 
     <!--My own js-->
     <script src="./js/main.js"></script>
@@ -63,8 +131,8 @@
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
+    <!--<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>-->
 </body>
 
 </html>

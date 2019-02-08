@@ -1,61 +1,110 @@
 /*general styles*/
+body{
+  overflow-y:hidden;
+}
 .maincontainer{
-    height:100vh;
-    margin-right:0px;
-    margin-left:0px;
-    display:flex;
-  }
-  .controlbar{
-    height:100%;
-    background-color:#4f1875; 
-    color:white;
-    width:25%;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    text-align:left;
-  }
-  #logo{
-    width:85%;
-    margin:2%;
-  }
-  .input-form{
-    width:90%;
-  }
-  .infodisplay{
-    width:75%;
-    height:100%;
-    overflow-y:scroll;
-  }
-  .mapcontainer{
-    width:100%;
-    height:100%;
-  }
-  
-  /* scrollbar */
-  /*taked from my git https://github.com/leotalorac/co2map/blob/master/css/main.css*/
-  /* width */
-  ::-webkit-scrollbar {
-      width: 10px;
-  }
-  
-  /* Track */
-  ::-webkit-scrollbar-track {
-      /* box-shadow: inset 0 0 5px grey;  */
-      /* border: solid black 0.5px; */
-      border-radius: 10px;
-  }
-  
-  /* Handle */
-  ::-webkit-scrollbar-thumb {
-      background: grey; 
-      border-radius: 15px;
-  }
-  
-  /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
-      background: #a5a5a5; 
-  }
-  
-  
-  
+  height:100vh;
+  margin-right:0px;
+  margin-left:0px;
+  display:flex;
+}
+.controlbar{
+  height:100%;
+  position:relative;
+  background-color:#4f1875; 
+  color:white;
+  width:22%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:left;
+}
+#logo{
+  width:85%;
+  margin:2%;
+}
+.input-form{
+  width:90%;
+  margin:5%;
+}
+.input-form div{
+  margin-top:8%;
+}
+.input-form button{
+  margin:5%;
+  margin-top:10vh;
+  width:90%;
+}
+.footer{
+  height:50%;
+  width:100%;
+  position:absolute;
+  bottom:0;
+}
+.footer p{
+  position:absolute;
+  bottom:0; 
+  left:7%;
+}
+.infodisplay{
+  width:78%;
+  height:100%;
+  overflow-y:scroll;
+}
+.mapcontainer{
+  width:100%;
+  height:100%;
+}
+
+.showdata{
+  display:flex;
+  width:100%;
+  height:100%;
+}
+.sub-showdata{
+  width:50%;
+  padding:2%;
+}
+tablea{
+  color:#007bff;
+}
+
+.tablebutton{
+  position: absolute;
+  top:87%;
+  left:24%;
+  width:8%;
+}
+.mapbutton{
+  position: absolute;
+  top:93%;
+  left:24%;
+  width:8%;
+}
+
+/* scrollbar */
+/*taked from my git https://github.com/leotalorac/co2map/blob/master/css/main.css*/
+/* width */
+::-webkit-scrollbar {
+	width: 15px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+	/* box-shadow: inset 0 0 5px grey;  */
+	/* border: solid black 0.5px; */
+	border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+	background: grey; 
+	border-radius: 15px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	background:#a5a5a5; 
+}
+
+
