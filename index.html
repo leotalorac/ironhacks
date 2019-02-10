@@ -23,16 +23,28 @@
             </img>
             <form class="input-form">
                 <div class="form-group">
-                    <label for="customRange1">Risk</label>
-                    <input type="range" class="custom-range" id="customRange1" />
+                    <label for="riskslider">Risk</label>
+                    <input type="range" class="custom-range slider" id="riskslider" value="0" min="0" max="100" step="10" />
+                    <div class="sliderdiv">
+                        <span>Safer</span>
+                        <span>Risky</span>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="customRange1">Distance</label>
-                    <input type="range" class="custom-range" id="customRange1" />
+                    <label for="distanceslider">Distance</label>
+                    <input type="range" class="custom-range slider" id="distanceslider" value="0" min="0" max="100" step="10" />
+                    <div class="sliderdiv">
+                        <span>far away</span>
+                        <span>Closer</span>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="customRange1">Affortable</label>
-                    <input type="range" class="custom-range" id="customRange1" />
+                    <label for="afforslider">Affordable</label>
+                    <input type="range" class="custom-range slider" id="afforslider" value="0" min="0" max="100" step="10" />
+                    <div class="sliderdiv">
+                        <span>Cheaper</span>
+                        <span>Expensive</span>
+                    </div>
                 </div>
                 <div class="custom-control custom-switch">
                     <input type="checkbox" class="custom-control-input" id="customSwitch1" />
@@ -115,19 +127,19 @@
         </div>
     </div>
 
-
-
-
     <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
         crossorigin="anonymous"></script>
 
     <!--My own js-->
     <script src="./js/main.js"></script>
     <script src="./js/map.js"></script>
+    
+    
     <!-- Google Maps -->
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwWYDB9v1MopiTtPpUXMDaCwAlOQbtn3c&callback=onGoogleMapResponse"></script>
-
-    <!--<script	src="./js/visualization.js"></script>-->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAD5EdEsOiH37NAO6voM3pZiTanOshSoHw&callback=onGoogleMapResponse"></script>
+    <!-- map2 -->
+    <!-- <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwWYDB9v1MopiTtPpUXMDaCwAlOQbtn3c&callback=onGoogleMapResponse"></script> -->
+    <!--<script src="./js/visualization.js"></script>-->
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

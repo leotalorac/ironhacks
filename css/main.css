@@ -27,7 +27,7 @@ body{
   width:90%;
   margin:5%;
 }
-.input-form div{
+.form-group{
   margin-top:8%;
 }
 .input-form button{
@@ -35,6 +35,26 @@ body{
   margin-top:10vh;
   width:90%;
 }
+.sliderdiv{
+  margin-top: -2%;
+  display: flex;
+  justify-content: space-between;
+  color:  #AA8FFF;
+}
+.slider{
+  background-color: aliceblue;
+}
+#distanceslider::-webkit-slider-thumb{
+  background-color: #FF0000;
+}
+#riskslider::-webkit-slider-thumb{
+  background-color: #FFFC19;
+}
+#afforslider::-webkit-slider-thumb{
+  background-color: #1485CC;
+}
+
+
 .footer{
   height:50%;
   width:100%;
@@ -73,38 +93,38 @@ tablea{
   position: absolute;
   top:87%;
   left:24%;
-  width:8%;
+  width:15%;
 }
 .mapbutton{
   position: absolute;
   top:93%;
   left:24%;
-  width:8%;
+  width:15%;
 }
 
 /* scrollbar */
 /*taked from my git https://github.com/leotalorac/co2map/blob/master/css/main.css*/
 /* width */
 ::-webkit-scrollbar {
-	width: 15px;
+  width: 15px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-	/* box-shadow: inset 0 0 5px grey;  */
-	/* border: solid black 0.5px; */
-	border-radius: 10px;
+  /* box-shadow: inset 0 0 5px grey;  */
+  /* border: solid black 0.5px; */
+  border-radius: 10px;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-	background: grey; 
-	border-radius: 15px;
+  background: grey; 
+  border-radius: 15px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-	background:#a5a5a5; 
+  background:#a5a5a5; 
 }
 
 
