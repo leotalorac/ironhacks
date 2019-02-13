@@ -1,10 +1,5 @@
 //map.js create by: Luis Eduardo Otalora Cubides
-var map;
-var mappoligons=[];
-var mapmarkers=[];
-var upos = {"lat": 40.729364,"lng": -73.996480};
-var colors =["red","blue","green","black","yellow"]
-var maxdist = 0.2658503482103375
+
 //put the poligons on the map
 //draw the poligons
 async function drawpoligons() {
@@ -22,13 +17,14 @@ async function drawpoligons() {
       })
     }
   }
+  await calculateDistances();
 }
 function putpoligon(coords,i){
   var tempol = new google.maps.Polygon({
     paths: coords,
     strokeColor: '#C29CFF',
     strokeOpacity: 0.8,
-    strokeWeight: 3,
+    strokeWeight: 2,
     fillColor: '#C29CFF',
     fillOpacity: 0.35
   });
