@@ -11,27 +11,42 @@ async function drawpoligons() {
   //map.data.loadGeoJson(linkpoligons);
   await getDatageo(linkpoligons);
   for(i in poligons){
+    districts[i]["poligs"]=[]
+    districts[i]["center"]={}
+    districts[i]["id"]=poligons[i].id
     if(poligons[i].type == "Polygon"){
-      putpoligon(poligons[i].coords);
+      putpoligon(poligons[i].coords,i);
     }else{
       poligons[i].coords.forEach((element) =>{
-        putpoligon(element);
+        putpoligon(element,i);
       })
     }
   }
 }
-function putpoligon(coords){
+function putpoligon(coords,i){
   var tempol = new google.maps.Polygon({
     paths: coords,
-    strokeColor: '#FF0000',
+    strokeColor: '#C29CFF',
     strokeOpacity: 0.8,
     strokeWeight: 3,
-    fillColor: '#FF0000',
+    fillColor: '#C29CFF',
     fillOpacity: 0.35
   });
   tempol.setMap(map);
   mappoligons.push(tempol);
-
+  districts[i]["poligs"].push(mappoligons.length-1);
+  let bounds = new google.maps.LatLngBounds();
+  coords.forEach(element => {
+    bounds.extend(element);
+  });
+  if(Object.keys(districts[i]["center"]).length === 0){
+    districts[i]["center"]={"lat":bounds.getCenter().lat(),"lng":bounds.getCenter().lng()}
+  }else{
+    let lat = (districts[i]["center"]["lat"]+bounds.getCenter().lat())/2;
+    let lng = (districts[i]["center"]["lng"]+bounds.getCenter().lng())/2; 
+    districts[i]["center"]={"lat":lat,"lng":lng}
+  }
+  
 }
 function putmarker(position,icon,title){
   var marker = new google.maps.Marker({
