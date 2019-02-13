@@ -82,8 +82,14 @@ body{
   height:100%;
 }
 .sub-showdata{
-  width:50%;
+  width:30%;
   padding:2%;
+}
+.sub-showdata-table{
+  width:70%;
+  padding:2%;
+  height: 100%;
+  overflow-y: scroll;
 }
 tablea{
   color:#007bff;

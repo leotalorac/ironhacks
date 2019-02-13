@@ -24,7 +24,7 @@
             <form class="input-form">
                 <div class="form-group">
                     <label for="riskslider">Risk</label>
-                    <input type="range" class="custom-range slider" id="riskslider" value="0" min="0" max="100" step="10" />
+                    <input type="range" class="custom-range slider" id="riskslider" value="0" min="0" max="100" step="10"/>
                     <div class="sliderdiv">
                         <span>Safer</span>
                         <span>Risky</span>
@@ -34,7 +34,7 @@
                     <label for="distanceslider">Distance</label>
                     <input type="range" class="custom-range slider" id="distanceslider" value="0" min="0" max="100" step="10" />
                     <div class="sliderdiv">
-                        <span>far away</span>
+                        <span>Far Away</span>
                         <span>Closer</span>
                     </div>
                 </div>
@@ -73,53 +73,17 @@
                 <div class="sub-showdata">
 
                 </div>
-                <div class="sub-showdata">
+                <div class="sub-showdata-table">
                     <table class="table">
                         <thead class="thead-dark">
                             <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">District</th>
                                 <th scope="col">Points</th>
-                                <th scope="col">Watch on map</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <th scope="row">1</th>
-                                <td>District 1</td>
-                                <td>5000</td>
-                                <td><button class="btn btn-primary">Click here</button></td>
-                            </tr>
-                            <tr>
-                                <th scope="row">2</th>
-                                <td>District 2</td>
-                                <td>4200</td>
-                                <td><button class="btn btn-primary">Click here</button></td>
-                            </tr>
-                            <tr>
-                                <th scope="row">3</th>
-                                <td>District 3</td>
-                                <td>4000</td>
-                                <td><button class="btn btn-primary">Click here</button></td>
-                            </tr>
-                            <tr>
-                                <th scope="row">4</th>
-                                <td>District 4</td>
-                                <td>4000</td>
-                                <td><button class="btn btn-primary">Click here</button></td>
-                            </tr>
-                            <tr>
-                                <th scope="row">5</th>
-                                <td>District 5</td>
-                                <td>4000</td>
-                                <td><button class="btn btn-primary">Click here</button></td>
-                            </tr>
-                            <tr>
-                                <th scope="row">6</th>
-                                <td>District 6</td>
-                                <td>4000</td>
-                                <td><button class="btn btn-primary">Click here</button></td>
-                            </tr>
+                        <tbody id="tablebody">
+                            
                         </tbody>
                     </table>
                 </div>

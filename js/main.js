@@ -153,6 +153,12 @@ $("#distanceslider").change((event) => {
             return a[1] - b[1];
         }).reverse();
         console.log(sortable)
+        let table = $("#tablebody");
+        let o =0;
+        sortable.forEach((element) =>{
+            table.append("<tr><th scope='row'>"+o+"</th> <td>District "+element[0]+"</td> "+"<td>"+element[1]+"</td></tr>");
+            o++;
+        });
     }else{
         mappoligons.forEach((element) =>{
             element.setOptions({
