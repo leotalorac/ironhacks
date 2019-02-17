@@ -339,4 +339,5 @@ async function onGoogleMapResponse() {
   putmarker(upos,{url: "https://img.icons8.com/color/48/000000/region-code.png"},"NYU");
   await drawpoligons();
   getDatarisk(linkrisk);
+  getDataaff(linkaff);
 }
