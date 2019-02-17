@@ -1,5 +1,6 @@
 const linkpoligons = "https://services5.arcgis.com/GfwWNkhOj9bNBqoJ/arcgis/rest/services/nycd/FeatureServer/0/query?where=1=1&outFields=*&outSR=4326&f=geojson"
 const linkrisk = "https://data.cityofnewyork.us/resource/9s4h-37hy.json?cmplnt_fr_dt=2015-12-31T00:00:00.000"
+const linkaff = "https://data.cityofnewyork.us/api/views/hg8x-zxpr/rows.json?accessType=DOWNLOAD"
 //const nottoshow = [58, 29, 65, 64, 20, 66, 67, 9, 39, 14]
 //const nottoshow = [55, 62, 27, 61, 18, 63, 64, 8, 12, 36, 29]
 var districts = {};
@@ -19,7 +20,7 @@ var risk = 0;
 var dis = 0;
 var aff = 0;
 
-var colors = ["#FF0000", "#FF5D5C", "#FF8880", "#FFFC19", "#FFFF5F","#FFFFA4"]
+var colors = ["#6900FF", "#9954FF", "#BD93FF", "#FFCE1A", "#FFD546","#FFE282","#1DFF93","#7AFFBD","#D1FFEB"]
 //scroll down
 $("#tablebutton").click(function () {
     $('.infodisplay').animate({
@@ -35,7 +36,7 @@ $("#mapbutton").click(function () {
         "slow");
 });
 
-function getDatageo(url) {
+async function getDatageo(url) {
     let datafull;
     let data = $.get(url, () => {})
         .done(() => {
@@ -112,7 +113,13 @@ async function getDatarisk(url){
             // }
         });
 }
-
+async function getDataaff(url){
+    let data = $.get(url)
+        .done(() =>{
+            let tem = JSON.parse(data.responseText);
+            console.log(tem);
+        });
+}
 function calculateDistances() {
     for (i in districts) {
         let sumlat = districts[i].center.lat - upos.lat;
@@ -135,7 +142,7 @@ $("#riskslider").change((event) => {
                 let d = districts[i].crimes
                 pol.forEach((poligon) => {
                     mappoligons[poligon].setOptions({
-                        strokeColor: "black",
+                        strokeColor: "white",
                         strokeOpacity: 0.8,
                         strokeWeight: 1,
                         fillColor: colors[3],
@@ -150,7 +157,7 @@ $("#riskslider").change((event) => {
                 let d = districts[i].crimes
                 pol.forEach((poligon) => {
                     mappoligons[poligon].setOptions({
-                        strokeColor: "black",
+                        strokeColor: "white",
                         strokeOpacity: 0.8,
                         strokeWeight: 1,
                         fillColor: colors[4],
@@ -164,7 +171,7 @@ $("#riskslider").change((event) => {
                 let d = districts[i].crimes
                 pol.forEach((poligon) => {
                     mappoligons[poligon].setOptions({
-                        strokeColor: "black",
+                        strokeColor: "white",
                         strokeOpacity: 0.8,
                         strokeWeight: 1,
                         fillColor: colors[5],
@@ -194,7 +201,7 @@ $("#distanceslider").change((event) => {
                 let d = districts[i].distance
                 pol.forEach((poligon) => {
                     mappoligons[poligon].setOptions({
-                        strokeColor: "black",
+                        strokeColor: "white",
                         strokeOpacity: 0.8,
                         strokeWeight: 1,
                         fillColor: colors[0],
@@ -209,7 +216,7 @@ $("#distanceslider").change((event) => {
                 let d = districts[i].distance
                 pol.forEach((poligon) => {
                     mappoligons[poligon].setOptions({
-                        strokeColor: "black",
+                        strokeColor: "white",
                         strokeOpacity: 0.8,
                         strokeWeight: 1,
                         fillColor: colors[1],
@@ -223,7 +230,7 @@ $("#distanceslider").change((event) => {
                 let d = districts[i].distance
                 pol.forEach((poligon) => {
                     mappoligons[poligon].setOptions({
-                        strokeColor: "black",
+                        strokeColor: "white",
                         strokeOpacity: 0.8,
                         strokeWeight: 1,
                         fillColor: colors[2],
