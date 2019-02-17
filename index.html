@@ -12,7 +12,6 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
         crossorigin="anonymous">
-
     <title>NYU resindent searcher</title>
 </head>
 
@@ -24,15 +23,15 @@
             <form class="input-form">
                 <div class="form-group">
                     <label for="riskslider">Risk</label>
-                    <input type="range" class="custom-range slider" id="riskslider" value="0" min="0" max="100" step="10"/>
+                    <input type="range" class="custom-range slider" id="riskslider" value="0" min="0" max="3" step="1"/>
                     <div class="sliderdiv">
-                        <span>Safer</span>
                         <span>Risky</span>
+                        <span>Safer</span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="distanceslider">Distance</label>
-                    <input type="range" class="custom-range slider" id="distanceslider" value="0" min="0" max="100" step="10" />
+                    <input type="range" class="custom-range slider" id="distanceslider" value="0" min="0" max="3" step="1" />
                     <div class="sliderdiv">
                         <span>Far Away</span>
                         <span>Closer</span>
@@ -40,10 +39,10 @@
                 </div>
                 <div class="form-group">
                     <label for="afforslider">Affordable</label>
-                    <input type="range" class="custom-range slider" id="afforslider" value="0" min="0" max="100" step="10" />
+                    <input type="range" class="custom-range slider" id="afforslider" value="0" min="0" max="3" step="1" />
                     <div class="sliderdiv">
-                        <span>Cheaper</span>
                         <span>Expensive</span>
+                        <span>Cheaper</span>
                     </div>
                 </div>
                 <div class="custom-control custom-switch">
@@ -100,9 +99,9 @@
     
     
     <!-- Google Maps -->
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAD5EdEsOiH37NAO6voM3pZiTanOshSoHw&callback=onGoogleMapResponse"></script>
+    <!-- <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAD5EdEsOiH37NAO6voM3pZiTanOshSoHw&callback=onGoogleMapResponse"></script> -->
     <!-- map2 -->
-    <!-- <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwWYDB9v1MopiTtPpUXMDaCwAlOQbtn3c&callback=onGoogleMapResponse"></script> -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6YeNUtrmSRloKw8YGyh7SNLyjxdtD52w&callback=onGoogleMapResponse"></script>
     <!--<script src="./js/visualization.js"></script>-->
 
     <!-- Optional JavaScript -->

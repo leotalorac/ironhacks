@@ -17,7 +17,8 @@ async function drawpoligons() {
       })
     }
   }
-  await calculateDistances();
+  await calculateDistances(); 
+  
 }
 function putpoligon(coords,i){
   var tempol = new google.maps.Polygon({
@@ -26,10 +27,12 @@ function putpoligon(coords,i){
     strokeOpacity: 0.8,
     strokeWeight: 2,
     fillColor: '#C29CFF',
-    fillOpacity: 0.35
+    fillOpacity: 0.35,
+    title: String(poligons[i].id)
   });
   tempol.setMap(map);
   mappoligons.push(tempol);
+  tempol.addListener('click', (event) => {console.log(districts[i])});
   districts[i]["poligs"].push(mappoligons.length-1);
   let bounds = new google.maps.LatLngBounds();
   coords.forEach(element => {
@@ -53,7 +56,7 @@ function putmarker(position,icon,title){
   });
 }
 //map response
-function onGoogleMapResponse() {
+async function onGoogleMapResponse() {
   map = new google.maps.Map(document.getElementById('googleMapContainer'), {
     center: {
       lat: 40.7291,
@@ -63,5 +66,6 @@ function onGoogleMapResponse() {
   });
   //put the university marker
   putmarker(upos,{url: "https://img.icons8.com/color/48/000000/region-code.png"},"NYU");
-  drawpoligons();
+  await drawpoligons();
+  getDatarisk(linkrisk);
 }
