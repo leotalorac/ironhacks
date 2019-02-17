@@ -12,6 +12,7 @@ async function drawpoligons() {
     if(poligons[i].type == "Polygon"){
       putpoligon(poligons[i].coords,i);
     }else{
+      console.log(poligons[i].coords)
       poligons[i].coords.forEach((element) =>{
         putpoligon(element,i);
       })

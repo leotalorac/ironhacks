@@ -43,9 +43,10 @@ async function getDatageo(url) {
             let tem = JSON.parse(data.responseText).features;
             poglo = tem
             for (i in tem) {
-                    let coords = tem[i]["geometry"]["coordinates"][0]
+                    let coords = tem[i]["geometry"]["coordinates"]
                     let jsoncoods = []
-                    if (tem[i]["geometry"]["type"] === "Polygon") {
+                    let type ="Polygon"
+                    if (coords.length ===1) {
                         let coords = tem[i]["geometry"]["coordinates"][0]
                         coords.forEach((element) => {
                             jsoncoods.push({
@@ -55,22 +56,21 @@ async function getDatageo(url) {
                         })
                     } else {
                         let coords = tem[i]["geometry"]["coordinates"]
+                        type = "Multipolygon"
                         coords.forEach((element) => {
                             let jarr = []
                             element.forEach((e) => {
-                                e.forEach((v) => {
                                     jarr.push({
-                                        "lat": v[1],
-                                        "lng": v[0]
+                                        "lat": e[1],
+                                        "lng": e[0]
                                     })
-                                })
                             });
                             jsoncoods.push(jarr)
                         })
                     }
                     poligons[i] = {
                         "id": tem[i]["id"],
-                        "type": tem[i]["geometry"]["type"],
+                        "type": type,
                         "coords": jsoncoods,
                     }
                     districts[i] = {
