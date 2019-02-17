@@ -5,7 +5,7 @@ const linkaff = "https://data.cityofnewyork.us/api/views/hg8x-zxpr/rows.json?acc
 //const nottoshow = [55, 62, 27, 61, 18, 63, 64, 8, 12, 36, 29]
 var districts = {};
 let crimes = [];
-let wachapanda ={1: 6, 2: 15, 3: 11, 4: 9, 5: 16, 6: 21, 7: 13, 8: 1, 9: 30, 10: 13, 11: 11, 12: 0, 13: 13, 14: 30, 15: 9, 16: 24, 17: 20, 18: 0, 19: 8, 20: 22, 21: 41, 22: 15, 23: 13, 24: 37, 25: 25, 26: 10, 27: 2, 28: 19, 29: 0, 30: 14, 31: 12, 32: 32, 33: 9, 34: 9, 35: 14, 36: 0, 37: 23, 38: 0, 39: 20, 40: 15, 41: 6, 42: 13, 43: 18, 44: 7, 45: 25, 46: 19, 47: 20, 48: 12, 49: 33, 50: 14, 51: 21, 52: 18, 53: 18, 54: 24, 55: 2, 56: 21, 57: 10, 58: 5, 59: 15, 60: 7, 61: 0, 62: 0, 63: 0, 64: 1, 65: 12, 66: 12, 67: 16, 68: 7, 69: 25, 70: 23, 71: 14}
+//let wachapanda ={1: 6, 2: 15, 3: 11, 4: 9, 5: 16, 6: 21, 7: 13, 8: 1, 9: 30, 10: 13, 11: 11, 12: 0, 13: 13, 14: 30, 15: 9, 16: 24, 17: 20, 18: 0, 19: 8, 20: 22, 21: 41, 22: 15, 23: 13, 24: 37, 25: 25, 26: 10, 27: 2, 28: 19, 29: 0, 30: 14, 31: 12, 32: 32, 33: 9, 34: 9, 35: 14, 36: 0, 37: 23, 38: 0, 39: 20, 40: 15, 41: 6, 42: 13, 43: 18, 44: 7, 45: 25, 46: 19, 47: 20, 48: 12, 49: 33, 50: 14, 51: 21, 52: 18, 53: 18, 54: 24, 55: 2, 56: 21, 57: 10, 58: 5, 59: 15, 60: 7, 61: 0, 62: 0, 63: 0, 64: 1, 65: 12, 66: 12, 67: 16, 68: 7, 69: 25, 70: 23, 71: 14}
 var poligons = {};
 let poglo;
 var map;
@@ -15,7 +15,6 @@ var upos = {
     "lat": 40.729364,
     "lng": -73.996480
 };
-
 var risk = 0;
 var dis = 0;
 var aff = 0;
@@ -60,10 +59,13 @@ async function getDatageo(url) {
                         coords.forEach((element) => {
                             let jarr = []
                             element.forEach((e) => {
+                                e.forEach((v) =>{
                                     jarr.push({
-                                        "lat": e[1],
-                                        "lng": e[0]
+                                        "lat": v[1],
+                                        "lng": v[0]
                                     })
+                                })
+                                    
                             });
                             jsoncoods.push(jarr)
                         })
@@ -76,7 +78,8 @@ async function getDatageo(url) {
                     districts[i] = {
                         "boro": (tem[i]["properties"]["BoroCD"] - (tem[i]["properties"]["BoroCD"] % 100)) / 100,
                         "code":tem[i]["properties"]["BoroCD"],
-                        "crimes":0
+                        "crimes":0,
+                        "projects":0
                     }
                 }
         });
@@ -90,34 +93,93 @@ async function getDatarisk(url){
     let data = $.get(url)
         .done(()  => {
             let tem = JSON.parse(data.responseText);
-            console.log(tem)
-            for(i in districts){
-                districts[i]["crimes"] = wachapanda[districts[i].id];
-            }
+            // for(i in districts){
+            //     districts[i]["crimes"] = wachapanda[districts[i].id];
+            // }
             // for (j in districts){
             //     wachapanda[districts[j].id] = 0
             // }
-            // for(let i =0;i<tem.length;i++){
-            //     let coords = tem[i]["lat_lon"]["coordinates"]
-            //     let jsoncoods = {"lat":coords[1],"lng":coords[0]};
-            //     var coordinate = new google.maps.LatLng(jsoncoods);//replace with your lat and lng values
-            //     for(j in districts){
-            //         districts[j]["poligs"].forEach((e)=>{
-            //             var isWithinPolygon = google.maps.geometry.poly.containsLocation(coordinate, mappoligons[e]);
-            //             if(isWithinPolygon){
-            //                 wachapanda[districts[j].id]++;
-            //             }
-            //         });
+            var coordinate;
+            var coords;
+            var jsoncoods;
+            //alert("please wait...")
+            yieldingLoop(tem.length,10,(i)=>{
+                let coords = tem[i]["lat_lon"]["coordinates"]
+                let jsoncoods = {"lat":coords[1],"lng":coords[0]};
+                coordinate = new google.maps.LatLng(jsoncoods);//replace with your lat and lng values
+                //console.log(i)
+                for(j in districts){
+                    districts[j]["poligs"].forEach((e)=>{
+                        var isWithinPolygon = google.maps.geometry.poly.containsLocation(coordinate, mappoligons[e]);
+                        if(isWithinPolygon){
+                            districts[j].crimes++;
+                        }
+                    });
+                }
+            },()=>{alert("done")})
+            //     for(let i =0;i<tem.length;i++){
+            //         let coords = tem[i]["lat_lon"]["coordinates"]
+            //         let jsoncoods = {"lat":coords[1],"lng":coords[0]};
+            //         coordinate = new google.maps.LatLng(jsoncoods);//replace with your lat and lng values
+            //         //console.log(i)
+            //         for(j in districts){
+            //             districts[j]["poligs"].forEach((e)=>{
+            //                 var isWithinPolygon = google.maps.geometry.poly.containsLocation(coordinate, mappoligons[e]);
+            //                 if(isWithinPolygon){
+            //                     districts[j].crimes++;
+            //                 }
+            //             });
+            //         }
             //     }
-            //     console.log(wachapanda);
-            // }
+            // alert("done")
+        });
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve("yess");
+            }, 1500);
         });
 }
 async function getDataaff(url){
     let data = $.get(url)
         .done(() =>{
-            let tem = JSON.parse(data.responseText);
-            console.log(tem);
+            let tem = JSON.parse(data.responseText)["data"];
+            let coords;
+            let jsoncoords;
+            //let projects=[]
+            yieldingLoop(tem.length,10,(i)=>{
+                coords = [parseFloat(tem[i][23]),parseFloat(tem[i][24])];
+                if(coords[0] != null){
+                    jsoncoords = {"lat":coords[0],"lng":coords[1]}
+                    coordinate = new google.maps.LatLng(jsoncoords);//replace with your lat and lng values
+                    for(j in districts){
+                        districts[j]["poligs"].forEach((e)=>{
+                            var isWithinPolygon = google.maps.geometry.poly.containsLocation(coordinate, mappoligons[e]);
+                            //console.log(isWithinPolygon)
+                            if(isWithinPolygon){
+                                districts[j].projects++;
+                            }
+                        });
+                    }
+                    //projects.push(jsoncoords);
+                }
+            },() => {alert("done2")})
+            // for(let i =0;i<tem.length;i++){
+            //     coords = [tem[i][23],tem[i][24]];
+            //     if(coords[0] != null){
+            //         jsoncoords = {"lat":coords[0],"lng":coords[1]}
+            //         coordinate = new google.maps.LatLng(jsoncoords);
+            //         for(j in districts){
+            //             districts[j]["poligs"].forEach((e)=>{
+            //                 var isWithinPolygon = google.maps.geometry.poly.containsLocation(coordinate, mappoligons[e]);
+            //                 if(isWithinPolygon){
+            //                     districts[j].projects++;
+            //                 }
+            //             });
+            //         }
+            //         projects.push(jsoncoords);
+            //     }
+            // }
+            //  console.log(projects)
         });
 }
 function calculateDistances() {
@@ -258,7 +320,6 @@ $("#distanceslider").change((event) => {
         }).reverse();
         let table = $("#tablebody");
         let o = 1;
-        console.log(sortable)
         for(let i =sortable.length-1;i>=sortable.length-11;i--){
             table.append("<tr><th scope='row'>" + o + "</th> <td>District " + sortable[i][0] + "</td> " + "<td>" + sortable[i][1] + "</td></tr>");
             o++;
@@ -276,3 +337,23 @@ $("#distanceslider").change((event) => {
     }
 
 });
+
+
+
+
+//utils
+//taken from https://stackoverflow.com/questions/26615966/how-to-make-non-blocking-javascript-code
+function yieldingLoop(count, chunksize, callback, finished) {
+    var i = 0;
+    (function chunk() {
+        var end = Math.min(i + chunksize, count);
+        for ( ; i < end; ++i) {
+            callback.call(null, i);
+        }
+        if (i < count) {
+            setTimeout(chunk, 0);
+        } else {
+            finished.call(null);
+        }
+    })();
+}
