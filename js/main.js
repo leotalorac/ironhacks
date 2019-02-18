@@ -1,25 +1,30 @@
+//--------------------------global variables-------------------------
+//datasets
 const linkpoligons = "https://services5.arcgis.com/GfwWNkhOj9bNBqoJ/arcgis/rest/services/nycd/FeatureServer/0/query?where=1=1&outFields=*&outSR=4326&f=geojson"
 const linkrisk = "https://data.cityofnewyork.us/resource/9s4h-37hy.json?cmplnt_fr_dt=2015-12-31T00:00:00.000"
 const linkaff = "https://data.cityofnewyork.us/api/views/hg8x-zxpr/rows.json?accessType=DOWNLOAD"
-//const nottoshow = [58, 29, 65, 64, 20, 66, 67, 9, 39, 14]
-//const nottoshow = [55, 62, 27, 61, 18, 63, 64, 8, 12, 36, 29]
-var districts = {};
-let crimes = [];
-//let wachapanda ={1: 6, 2: 15, 3: 11, 4: 9, 5: 16, 6: 21, 7: 13, 8: 1, 9: 30, 10: 13, 11: 11, 12: 0, 13: 13, 14: 30, 15: 9, 16: 24, 17: 20, 18: 0, 19: 8, 20: 22, 21: 41, 22: 15, 23: 13, 24: 37, 25: 25, 26: 10, 27: 2, 28: 19, 29: 0, 30: 14, 31: 12, 32: 32, 33: 9, 34: 9, 35: 14, 36: 0, 37: 23, 38: 0, 39: 20, 40: 15, 41: 6, 42: 13, 43: 18, 44: 7, 45: 25, 46: 19, 47: 20, 48: 12, 49: 33, 50: 14, 51: 21, 52: 18, 53: 18, 54: 24, 55: 2, 56: 21, 57: 10, 58: 5, 59: 15, 60: 7, 61: 0, 62: 0, 63: 0, 64: 1, 65: 12, 66: 12, 67: 16, 68: 7, 69: 25, 70: 23, 71: 14}
-var poligons = {};
-let poglo;
-var map;
-var mappoligons = [];
-var mapmarkers = [];
+const linknighthoods = "https://data.cityofnewyork.us/api/views/xyye-rtrs/rows.json?accessType=DOWNLOAD"
+//extra
+const linkgalleries = "https://data.cityofnewyork.us/api/views/43hw-uvdj/rows.json?accessType=DOWNLOAD"
+const linkmuseums = "https://data.cityofnewyork.us/api/views/fn6f-htvy/rows.json?accessType=DOWNLOAD"
+
+
+// position of the university
 var upos = {
     "lat": 40.729364,
     "lng": -73.996480
 };
-var risk = 0;
-var dis = 0;
-var aff = 0;
+var districts = {};
 
+
+//-------------------------------map global variables-------------------
+var map;
+var mappoligons = [];
+var mapmarkers = [];
 var colors = ["#6900FF", "#9954FF", "#BD93FF", "#FFCE1A", "#FFD546","#FFE282","#1DFF93","#7AFFBD","#D1FFEB"]
+
+
+//--------------------------------front animations---------------------------
 //scroll down
 $("#tablebutton").click(function () {
     $('.infodisplay').animate({
@@ -35,6 +40,19 @@ $("#mapbutton").click(function () {
         "slow");
 });
 
+
+//---------------------------------------sliders variables----------------------------
+var risk = 0;
+var dis = 0;
+var aff = 0;
+
+
+let crimes = [];
+var poligons = {};
+let poglo;
+
+
+//--------------------------------------data analisis---------------------------------
 async function getDatageo(url) {
     let datafull;
     let data = $.get(url, () => {})
