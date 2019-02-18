@@ -34,7 +34,7 @@ let disslider =$("#distanceslider")
 var map;
 var mappoligons = [];
 var mapmarkers = [];
-var colors = [ "#BD93FF", "#9954FF","#6900FF", "#FFE282", "#FFD546","#FFCE1A", "#1DFF93", "#7AFFBD", "#D1FFEB"]
+var colors = [ "#BD93FF", "#9954FF","#6900FF", "#FFE282", "#FFD546","#FFCE1A",  "#D1FFEB", "#7AFFBD","#1DFF93"]
 var boros = ["Manhattan", "Brooklyn", "Queens", "Staten Island", "Bronx"]
 
 //--------------------------------front animations---------------------------
@@ -250,14 +250,13 @@ async function getAffData(url){
                 let affdata = JSON.parse(data.responseText);
                 // console.log(affdata.meta.view.columns);
                 affdata = affdata.data
-                
                 console.log("start")
-                yieldingLoop(affdata.length,10,(i) =>{
-                    if(affdata[i][23] != null){
-                        let jsoncoods = {"lat":parseFloat(affdata[i][23]),"lng":parseFloat(affdata[i][24])};
+                affdata.forEach((element)=>{
+                    if(element[23] != null){
+                        let jsoncoods = {"lat":parseFloat(element[23]),"lng":parseFloat(element[24])};
                         //calculate the ponderate average
-                        let total= affdata[i][31]+affdata[i][32]+affdata[i][33]+affdata[i][34]+affdata[i][35];
-                        let prom = (6*affdata[i][31] + 5*affdata[i][31]+4*affdata[i][32]+3*affdata[i][33]+2*affdata[i][34]+affdata[i][35])/total;
+                        let total= element[31]+element[32]+element[33]+element[34]+element[35];
+                        let prom = (6*element[31] + 5*element[31]+4*element[32]+3*element[33]+2*element[34]+element[35])/total;
                         //add the prom to the data structure
                         //console.log(prom)
                         for(j in districts){
@@ -269,12 +268,9 @@ async function getAffData(url){
                             });
                         }
                     }   
-                },() =>{
-                    console.log("finish");
-                    calculateProms();
-                });                    
+                })                    
                 console.log("finish");
-                //calculateProms();
+                calculateProms();
                 resolve("ready")
             });
     })
@@ -284,9 +280,11 @@ async function getAffData(url){
 function calculateProms(){
     for(j in districts){
         let arr = districts[j].promaff
-        sum = arr.reduce(function(a, b) { return a + b; });
-        avg = sum / arr.length;
-        districts[j].promaffn = avg
+        if(arr.length){
+            sum = arr.reduce(function(a, b) { return a + b; });
+            avg = sum / arr.length;
+            districts[j].promaffn = avg
+        }
     }
 }
 
@@ -355,6 +353,37 @@ function drawRisk(color){
     }
 }
 
+//affort slider
+affslider.change((event) =>{
+    //parse the value 
+    aff = parseInt(event.target.value);
+    //draw just risk
+    if(parseInt(risk) ===0 && parseInt(aff) !==0 && parseInt(dis) === 0){
+        drawAff(colors[5+parseInt(event.target.value)])
+    }else{
+        defaultdraw();
+    }
+});
+
+
+//draw
+function drawAff(color){
+    for(i in districts){
+        //get the crimes by district
+        let pol = districts[i].poligs;
+        let d = districts[i].promaffn;
+        pol.forEach((poligon) => {
+            poligon.setOptions({
+                strokeColor: "white",
+                strokeOpacity: 0.8,
+                strokeWeight: 1,
+                fillColor: color,
+                fillOpacity: d/2
+            });
+        });
+    }
+}   
+
 
 
 
@@ -415,12 +444,13 @@ $(document).ready(async () => {
     await drawPolygons();
     progressbar("40%","Getting nightboors and calculating distances...")
     //see the district withouth nighthoods
-    await getNightboors(linknighthoods);
+    //await getNightboors(linknighthoods);
     //calculate risk data and save it    
     progressbar("60%","Calculating risk data....")
-    await getRisk(linkrisk);
+    
+    //await getRisk(linkrisk);
     progressbar("80%","Calculating affortable data....")
-    await getAffData(linkaff);
+    //await getAffData(linkaff);
     progressbar("90%","Still calculating....")
     progressbar("99%","Ready")
     setTimeout(() => {
