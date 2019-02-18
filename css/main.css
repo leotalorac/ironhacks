@@ -108,6 +108,21 @@ tablea{
   width:15%;
 }
 
+/* charge */
+.floatchargin{
+  position: absolute;
+  height: 15vh;
+  width: 30vw;
+  top:  40vh;
+  left: 40vw;
+  z-index: 5;
+  background-color: whitesmoke;
+  padding:1% 2% 2% 2%;
+  border-radius: 1rem;
+}
+
+
+
 /* scrollbar */
 /*taked from my git https://github.com/leotalorac/co2map/blob/master/css/main.css*/
 /* width */

@@ -283,16 +283,21 @@ async function onGoogleMapResponse() {
 }
 
 //-----------------------------ultils functions --------------------------------------
+//put a marker in the map
 function putMarker(position,icon,title){
+    //create and set the marker's propieties
     var marker = new google.maps.Marker({
     position:position,
     map: map,
     icon: icon,
     title:title    
     });
+    //add it to the general array
     mapmarkers.push(marker);
 }
-function putPoligon(coords,parent){
+//create and put a poligon in the map
+function putPolygon(coords,parent){
+    //create the poligon
     var tempol = new google.maps.Polygon({
         paths: coords,
         strokeColor: '#C29CFF',
@@ -302,19 +307,37 @@ function putPoligon(coords,parent){
         fillOpacity: 0.35,
         map
     });
-    parent.push(tempol);
+    //saved on the data structure
+    parent.poligs.push(tempol);
+    //set the center of te poligon and saver 
+    setCenter(coords,parent);
 }
-
-
+// save the center on the data structure
+function setCenter(coords,parent,options){
+    //calculate the center
+    let bounds = new google.maps.LatLngBounds();
+    coords.forEach(element => {
+      bounds.extend(element);
+    });
+    //saved
+    parent.center={"lat":bounds.getCenter().lat(),"lng":bounds.getCenter().lng()};
+}
+//fucntion to know is in a poligon
+function isinPolygon(point,polygon){
+    //create a latlng object
+    let coordinate = new google.maps.LatLng(point);
+    //look for it is in
+    return google.maps.geometry.poly.containsLocation(coordinate, polygon);
+}
 //----------------------------draw general functions ----------------------
 
-function drawPoligons(){
+function drawPolygons(){
     //go over districs
     for(id in districts){
         //get the coords and draw the poligons
         districts[id].coords.forEach(bounds => {
             //draw the poligon on the map
-            putPoligon(bounds,districts[id].poligs);
+            putPolygon(bounds,districts[id]);
         });
     }
 }
