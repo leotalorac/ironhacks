@@ -34,7 +34,10 @@ let disslider =$("#distanceslider")
 var map;
 var mappoligons = [];
 var mapmarkers = [];
-var colors = [ "#BD93FF", "#9954FF","#6900FF", "#FFE282", "#FFD546","#FFCE1A",  "#D1FFEB", "#7AFFBD","#1DFF93"]
+var colors = [ "#BD93FF", "#9954FF","#0097B2", "#FFE282", "#FFD546","#FFCE1A",  "#D1FFEB", "#7AFFBD","#1DFF93"];
+var discolors = ["#6900FF","#FF7400"];
+var riskcolors = ["#FFE300","#3000FF"];
+var affcolors =["#51FF00","#FF00F3"]
 var boros = ["Manhattan", "Brooklyn", "Queens", "Staten Island", "Bronx"]
 
 //--------------------------------front animations---------------------------
@@ -216,9 +219,9 @@ async function getRisk(url){
             .done(()=>{
                 //parse the data
                 let riskdata = JSON.parse(data.responseText);
-                riskdata.forEach((element) =>{
+                yieldingLoop(riskdata.length,10,(i)=>{
                     //get the coords of the crime 
-                    let coords = element["lat_lon"]["coordinates"]
+                    let coords = riskdata[i]["lat_lon"]["coordinates"]
                     //create latlng object
                     let jsoncoods = {"lat":coords[1],"lng":coords[0]};
                     //add the crime to the data structure
@@ -230,7 +233,8 @@ async function getRisk(url){
                             }
                         });
                     }
-                });
+                })
+                    
                 //ready and go back
                 console.log("risk ready");
                 resolve("ready");
@@ -251,12 +255,12 @@ async function getAffData(url){
                 // console.log(affdata.meta.view.columns);
                 affdata = affdata.data
                 console.log("start")
-                affdata.forEach((element)=>{
-                    if(element[23] != null){
-                        let jsoncoods = {"lat":parseFloat(element[23]),"lng":parseFloat(element[24])};
+                yieldingLoop(affdata.length,10,(i) =>{
+                    if(affdata[i][23] != null){
+                        const jsoncoods = {"lat":parseFloat(affdata[i][23]),"lng":parseFloat(affdata[i][24])};
                         //calculate the ponderate average
-                        let total= element[31]+element[32]+element[33]+element[34]+element[35];
-                        let prom = (6*element[31] + 5*element[31]+4*element[32]+3*element[33]+2*element[34]+element[35])/total;
+                        const total= affdata[i][31]+affdata[i][32]+affdata[i][33]+affdata[i][34]+affdata[i][35];
+                        const prom = (6*affdata[i][31] + 5*affdata[i][31]+4*affdata[i][32]+3*affdata[i][33]+2*affdata[i][34]+affdata[i][35])/total;
                         //add the prom to the data structure
                         //console.log(prom)
                         for(j in districts){
@@ -268,9 +272,8 @@ async function getAffData(url){
                             });
                         }
                     }   
-                })                    
-                console.log("finish");
-                calculateProms();
+                },()=>{console.log("finish");});                    
+                //calculateProms();
                 resolve("ready")
             });
     })
@@ -300,23 +303,32 @@ function calculateProms(){
 disslider.change((event)=>{
     dis = parseInt(event.target.value);
     if(parseInt(risk)===0 && parseInt(aff) ===0 && parseInt(dis) != 0){
-        drawDistance(colors[dis-1])
+        drawDistance(dis)
     }else{
         defaultdraw();
     }
 })
 //draw the distance 
-function drawDistance(color){
+function drawDistance(value){
     for(i in districts){
         let pol = districts[i].poligs;
-        let d = districts[i].distance
+        let d = districts[i].distance;
+        let inten=0;
+        let color;
+        if(value ===1){
+            inten =  1 - (d * 3);
+            color = discolors[0];
+        }else{
+            color = discolors[1];
+            inten = (d*3)
+        }
         pol.forEach((poligon) => {
             poligon.setOptions({
                 strokeColor: "white",
                 strokeOpacity: 0.8,
                 strokeWeight: 1,
                 fillColor: color,
-                fillOpacity: 1 - (d * 3)
+                fillOpacity: inten
             });
         });
     }
@@ -329,25 +341,34 @@ riskslider.change((event) =>{
     risk = parseInt(event.target.value);
     //draw just risk
     if(parseInt(risk) !=0 && parseInt(aff) ===0 && parseInt(dis) === 0){
-        drawRisk(colors[2+parseInt(event.target.value)])
+        drawRisk(risk)
     }else{
         defaultdraw();
     }
 });
 
 //draw risks
-function drawRisk(color){
+function drawRisk(value){
     for(i in districts){
         //get the crimes by district
         let pol = districts[i].poligs;
         let d = districts[i].crimes;
+        let inten =0;
+        let color;
+        if(value === 1){
+            color = riskcolors[0];
+            inten = 1 - (d/60)
+        }else{
+            color = riskcolors[1]
+            inten = (d/60)
+        }
         pol.forEach((poligon) => {
             poligon.setOptions({
                 strokeColor: "white",
                 strokeOpacity: 0.8,
                 strokeWeight: 1,
                 fillColor: color,
-                fillOpacity: 1 - (d/60)
+                fillOpacity: inten
             });
         });
     }
@@ -359,7 +380,7 @@ affslider.change((event) =>{
     aff = parseInt(event.target.value);
     //draw just risk
     if(parseInt(risk) ===0 && parseInt(aff) !==0 && parseInt(dis) === 0){
-        drawAff(colors[5+parseInt(event.target.value)])
+        drawAff(aff)
     }else{
         defaultdraw();
     }
@@ -367,18 +388,27 @@ affslider.change((event) =>{
 
 
 //draw
-function drawAff(color){
+function drawAff(value){
     for(i in districts){
         //get the crimes by district
         let pol = districts[i].poligs;
         let d = districts[i].promaffn;
+        let color;
+        let inten;
+        if(value ===1){
+            color = affcolors[0];
+            inten = d/2;
+        }else{
+            color = affcolors[1];
+            inten = 1-d/2;
+        }
         pol.forEach((poligon) => {
             poligon.setOptions({
                 strokeColor: "white",
                 strokeOpacity: 0.8,
                 strokeWeight: 1,
                 fillColor: color,
-                fillOpacity: d/2
+                fillOpacity: inten
             });
         });
     }
@@ -444,13 +474,12 @@ $(document).ready(async () => {
     await drawPolygons();
     progressbar("40%","Getting nightboors and calculating distances...")
     //see the district withouth nighthoods
-    //await getNightboors(linknighthoods);
+    await getNightboors(linknighthoods);
     //calculate risk data and save it    
     progressbar("60%","Calculating risk data....")
-    
-    //await getRisk(linkrisk);
+    getRisk(linkrisk);
     progressbar("80%","Calculating affortable data....")
-    //await getAffData(linkaff);
+    getAffData(linkaff);
     progressbar("90%","Still calculating....")
     progressbar("99%","Ready")
     setTimeout(() => {
