@@ -119,34 +119,22 @@ function getbounds(jsonelement,type) {
     let subarr;
     //round the array of coords 
     jsonelement.forEach((arr) => {
-        
-        if(type == "Polygon"){
-            subarr = []
-            arr.forEach((coords) => {
-                //transform on latlng objects
-                jsoncoods = {
-                    "lat": coords[1],
-                    "lng": coords[0]
-                }
-                //save it
-                subarr.push(jsoncoods)
-            })
-            //save it
-            coordsarr.push(subarr);
-        }else{
-            subarr = []
-            arr[0].forEach((coords) => {
-                //transform on latlng objects
-                jsoncoods = {
-                    "lat": coords[1],
-                    "lng": coords[0]
-                }
-                //save it
-                subarr.push(jsoncoods)
-            })
-            //save it
-            coordsarr.push(subarr);
+        let arrfor=arr;
+        if(type != "Polygon"){
+            arrfor = arr[0]
         }
+            subarr = []
+            arrfor.forEach((coords) => {
+                //transform on latlng objects
+                jsoncoods = {
+                    "lat": coords[1],
+                    "lng": coords[0]
+                }
+                //save it
+                subarr.push(jsoncoods)
+            })
+            //save it
+            coordsarr.push(subarr);
     });
     //return the final array
     return coordsarr;
