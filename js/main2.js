@@ -216,9 +216,9 @@ async function getRisk(url){
             .done(()=>{
                 //parse the data
                 let riskdata = JSON.parse(data.responseText);
-                yieldingLoop(riskdata.length,10,(i)=>{
+                riskdata.forEach((element) =>{
                     //get the coords of the crime 
-                    let coords = riskdata[i]["lat_lon"]["coordinates"]
+                    let coords = element["lat_lon"]["coordinates"]
                     //create latlng object
                     let jsoncoods = {"lat":coords[1],"lng":coords[0]};
                     //add the crime to the data structure
@@ -230,9 +230,7 @@ async function getRisk(url){
                             }
                         });
                     }
-                },()=>{
-                    console.log("risk calculated final")
-                })
+                });
                 //ready and go back
                 console.log("risk ready");
                 resolve("ready");
@@ -419,19 +417,11 @@ $(document).ready(async () => {
     //see the district withouth nighthoods
     await getNightboors(linknighthoods);
     //calculate risk data and save it    
-    getRisk(linkrisk);
-    setTimeout(() => {
-        progressbar("60%","Calculating risk data....")
-    }, 2000);
-    
-    getAffData(linkaff);
+    await getRisk(linkrisk);
+    progressbar("60%","Calculating risk data....")
+    await getAffData(linkaff);
     progressbar("80%","Calculating affortable data....")
-    setTimeout(() => {
-        console.log("waiting....")
-    }, 2000);
-    setTimeout(() => {
-        progressbar("90%","Still calculating....")
-    }, 2000);
+    progressbar("90%","Still calculating....")
     progressbar("99%","Ready")
     setTimeout(() => {
         progressbar("100%")
