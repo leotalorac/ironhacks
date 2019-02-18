@@ -45,16 +45,14 @@ body{
   background-color: aliceblue;
 }
 #distanceslider::-webkit-slider-thumb{
-  background-color: #FF0000;
+  background-color: #6900FF ;
 }
 #riskslider::-webkit-slider-thumb{
-  background-color: #FFFC19;
+  background-color: #FFCE1A;
 }
 #afforslider::-webkit-slider-thumb{
-  background-color: #1485CC;
+  background-color: #1DFF93;
 }
-
-
 .footer{
   height:50%;
   width:100%;

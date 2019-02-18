@@ -22,12 +22,19 @@ var districts = {};
 
 let chargebar = $("#progressbarmap");
 let pcharge = $("#textchargin");
+let bar = $("#floatbar")
+let riskslider = $("#riskslider")
+let affslider =$("#afforslider")
+let disslider =$("#distanceslider")
+
+
+
 
 //-------------------------------map global variables-------------------
 var map;
 var mappoligons = [];
 var mapmarkers = [];
-var colors = ["#6900FF", "#9954FF", "#BD93FF", "#FFCE1A", "#FFD546", "#FFE282", "#1DFF93", "#7AFFBD", "#D1FFEB"]
+var colors = [ "#BD93FF", "#9954FF","#6900FF", "#FFCE1A", "#FFD546", "#FFE282", "#1DFF93", "#7AFFBD", "#D1FFEB"]
 var boros = ["Manhattan", "Brooklyn", "Queens", "Staten Island", "Bronx"]
 
 //--------------------------------front animations---------------------------
@@ -129,7 +136,7 @@ function getbounds(jsonelement) {
 
 //---------------------------------------------nighboors----------------------------------
 
-function getNightboors(url){
+async function getNightboors(url){
     return new Promise((resolve,reject)=>{
         setTimeout(() => {
             let data = $.get(url,()=>{
@@ -146,36 +153,27 @@ function getNightboors(url){
                         "lng":parseFloat(coords[1])
                     }
                     //log for districts without nightboors 
-                    let keys = Object.keys(districts)
-                    yieldingLoop(keys.length,10,(i)=>{
-                        console.log(keys[i]);
-                        districts[keys[i]].poligs.forEach((pol)=>{
+
+                    for(i in districts){
+                        districts[i].poligs.forEach((pol)=>{
                             if(isinPolygon(coords,pol)){
                                 //add the nightboors info
-                                districts[keys[i]].nightboors.push(coords);
-                                districts[keys[i]].nnighboors++;
+                                districts[i].nightboors.push(coords);
+                                districts[i].nnighboors++;
                             }
                         })
-                    })
-                    // for(i in districts){
-                    //     districts[i].poligs.forEach((pol)=>{
-                    //         if(isinPolygon(coords,pol)){
-                    //             //add the nightboors info
-                    //             districts[i].nightboors.push(coords);
-                    //             districts[i].nnighboors++;
-                    //         }
-                    //     })
-                    // }
+                    }
                 })
                 //delete the districts without inportance
                 cleandistricts();
+                calculateDistances();
                 console.log("done clear")
-                progressbar("75%","done")
+                resolve("ready")
             })
         }, 500);
     });
 }
-//fucntion to delete the districts without nightboors
+//func  tion to delete the districts without nightboors
 function cleandistricts(){
     for(i in districts){
         if(districts[i].nnighboors ===0){
@@ -188,15 +186,94 @@ function cleandistricts(){
     }
 }
 
+function calculateDistances() {
+    //calculate distances from the centers
+    for (i in districts) {
+        let sumlat = districts[i].center.lat - upos.lat;
+        let sumlng = districts[i].center.lng - upos.lng;
+        let distance = Math.sqrt((sumlat ** 2) + (sumlng ** 2))
+        // add it to the object
+        districts[i]["distance"] = distance
+    }
+}
+
+
+//------------------------------------------risk------------------------------------
+// async function getRisk(url){
+//     let data = $.get(url,()=>{
+//         console.log("Risk data donw");
+//     })
+//     .done(()=>{
+//         let riskdata = JSON.parse(data.responseText);
+//         yieldingLoop(riskdata.length,10,(i)=>{
+//             let coords = tem[i]["lat_lon"]["coordinates"]
+//             let jsoncoods = {"lat":coords[1],"lng":coords[0]};
+//             for(j in districts){
+//                 districts[j]["poligs"].forEach((e)=>{
+//                     if(isinPolygon(jsoncoods,e)){
+//                         districts[j].crimes++;
+//                     }
+//                 });
+//             }
+//         });
+//     });
+// }
+
+
+//--------------------------------------------------visualization data------------------------------------------
+//distance slider
+disslider.change((event)=>{
+    dis = event.target.value;
+    if(parseInt(risk)===0 && parseInt(aff) ===0 && parseInt(dis) != 0){
+        drawDistance(colors[event.target.value-1])
+    }else{
+        defaultdraw();
+    }
+})
+//draw the distance 
+function drawDistance(color){
+    for(i in districts){
+        let pol = districts[i].poligs;
+        let d = districts[i].distance
+        pol.forEach((poligon) => {
+            poligon.setOptions({
+                strokeColor: "white",
+                strokeOpacity: 0.8,
+                strokeWeight: 1,
+                fillColor: color,
+                fillOpacity: 1 - (d * 3)
+            });
+        });
+    }
+}
+//back to normal
+function defaultdraw(){
+    for(i in districts){
+        let pol = districts[i].poligs;        
+        pol.forEach((poligon) => {
+            poligon.setOptions({
+                strokeColor: "#C29CFF",
+                strokeOpacity: 0.8,
+                strokeWeight: 1,
+                fillColor: "#C29CFF",
+                fillOpacity: 0.35
+            });
+        });
+    }
+}
 
 //-------------------------------------------utils------------------------------------
 function progressbar(value,text){
     pcharge.text(text);
     chargebar.css("width",value);
+    if(value === "100%"){
+        bar.remove();
+    }
 }
 
 
 //taken from https://stackoverflow.com/questions/26615966/how-to-make-non-blocking-javascript-code
+//processing on blocks
 function yieldingLoop(count, chunksize, callback, finished) {
     var i = 0;
     (function chunk() {
@@ -218,10 +295,13 @@ function yieldingLoop(count, chunksize, callback, finished) {
 $(document).ready(async () => {
     progressbar("0%","Charging poligons...")
     await getGeoData(linkpoligons);
-    progressbar("25%","drawing poligons...")
+    progressbar("20%","drawing poligons...")
     await drawPolygons();
-    progressbar("50%","getting nightboors...")
-    getNightboors(linknighthoods);
-    console.log("wiii")
-    
+    progressbar("40%","getting nightboors and calculating distances...")
+    await getNightboors(linknighthoods);
+    progressbar("60%","calculation more data....")
+    progressbar("99%","Ready")
+    setTimeout(() => {
+        progressbar("100%")
+    }, 50);
 });
