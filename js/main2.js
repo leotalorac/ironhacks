@@ -252,13 +252,12 @@ async function getAffData(url){
                 affdata = affdata.data
                 
                 console.log("start")
-                let i =0
-                affdata.forEach((building)=>{
-                    if(building[23] != null){
-                        let jsoncoods = {"lat":parseFloat(building[23]),"lng":parseFloat(building[24])};
+                yieldingLoop(affdata.length,10,(i) =>{
+                    if(affdata[i][23] != null){
+                        let jsoncoods = {"lat":parseFloat(affdata[i][23]),"lng":parseFloat(affdata[i][24])};
                         //calculate the ponderate average
-                        let total= building[31]+building[32]+building[33]+building[34]+building[35];
-                        let prom = (6*building[31] + 5*building[31]+4*building[32]+3*building[33]+2*building[34]+building[35])/total;
+                        let total= affdata[i][31]+affdata[i][32]+affdata[i][33]+affdata[i][34]+affdata[i][35];
+                        let prom = (6*affdata[i][31] + 5*affdata[i][31]+4*affdata[i][32]+3*affdata[i][33]+2*affdata[i][34]+affdata[i][35])/total;
                         //add the prom to the data structure
                         //console.log(prom)
                         for(j in districts){
@@ -266,18 +265,16 @@ async function getAffData(url){
                                 if(isinPolygon(jsoncoods,e)){
                                     //saved on the district
                                     districts[j].promaff.push(prom);
-                                    return false;
                                 }
                             });
                         }
-                        i++;
-                        if(i>1000){
-                            progressbar("90%","Please be pacient..... ")
-                        }
                     }   
-                });
+                },() =>{
+                    console.log("finish");
+                    calculateProms();
+                });                    
                 console.log("finish");
-                calculateProms();
+                //calculateProms();
                 resolve("ready")
             });
     })
@@ -423,7 +420,7 @@ $(document).ready(async () => {
     progressbar("60%","Calculating risk data....")
     await getRisk(linkrisk);
     progressbar("80%","Calculating affortable data....")
-    await getAffData(linkaff);
+    getAffData(linkaff);
     progressbar("99%","Ready")
     setTimeout(() => {
         progressbar("100%")
