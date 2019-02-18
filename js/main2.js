@@ -76,11 +76,12 @@ async function getGeoData(url) {
                 //parse the json
                 let datajson = JSON.parse(data.responseText).features;
                 //log to revision
-                //console.log(datajson)
+                console.log(datajson)
                 //convert to poligons
                 datajson.forEach((element) => {
                     //the the coords to create a poligon
-                    let coords = getbounds(element["geometry"]["coordinates"]);
+                    let type = element["geometry"]["type"]
+                    let coords = getbounds(element["geometry"]["coordinates"],type);
                     //get the id
                     let id = element.id;
                     //get the boro cd and code
@@ -98,7 +99,8 @@ async function getGeoData(url) {
                         nightboors:[],
                         nnighboors:0,
                         center:{},
-                        distance:0
+                        distance:0,
+                        type
                     }
                 })
                 console.log("geoshapes saved")
@@ -110,25 +112,41 @@ async function getGeoData(url) {
 
 }
 //get the coords for  the poligon
-function getbounds(jsonelement) {
+function getbounds(jsonelement,type) {
     //variables to save 
     let coordsarr = [];
     let jsoncoods = {};
     let subarr;
     //round the array of coords 
     jsonelement.forEach((arr) => {
-        subarr = []
-        arr.forEach((coords) => {
-            //transform on latlng objects
-            jsoncoods = {
-                "lat": coords[1],
-                "lng": coords[0]
-            }
+        
+        if(type == "Polygon"){
+            subarr = []
+            arr.forEach((coords) => {
+                //transform on latlng objects
+                jsoncoods = {
+                    "lat": coords[1],
+                    "lng": coords[0]
+                }
+                //save it
+                subarr.push(jsoncoods)
+            })
             //save it
-            subarr.push(jsoncoods)
-        })
-        //save it
-        coordsarr.push(subarr);
+            coordsarr.push(subarr);
+        }else{
+            subarr = []
+            arr[0].forEach((coords) => {
+                //transform on latlng objects
+                jsoncoods = {
+                    "lat": coords[1],
+                    "lng": coords[0]
+                }
+                //save it
+                subarr.push(jsoncoods)
+            })
+            //save it
+            coordsarr.push(subarr);
+        }
     });
     //return the final array
     return coordsarr;

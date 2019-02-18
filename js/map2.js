@@ -338,6 +338,7 @@ function drawPolygons(){
         districts[id].coords.forEach(bounds => {
             //draw the poligon on the map
             console.log(bounds);
+            console.log(id)
             putPolygon(bounds,districts[id]);
         });
     }
