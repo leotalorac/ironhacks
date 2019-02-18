@@ -255,6 +255,7 @@ async function getAffData(url){
                 // console.log(affdata.meta.view.columns);
                 affdata = affdata.data
                 console.log("start")
+                let sum,avg;
                 yieldingLoop(affdata.length,10,(i) =>{
                     if(affdata[i][23] != null){
                         const jsoncoods = {"lat":parseFloat(affdata[i][23]),"lng":parseFloat(affdata[i][24])};
@@ -268,6 +269,10 @@ async function getAffData(url){
                                 if(isinPolygon(jsoncoods,e)){
                                     //saved on the district
                                     districts[j].promaff.push(prom);
+                                    let arr = districts[j].promaff
+                                        sum = arr.reduce(function(a, b) { return a + b; });
+                                        avg = sum / arr.length;
+                                        districts[j].promaffn = avg
                                 }
                             });
                         }
