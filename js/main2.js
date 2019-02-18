@@ -417,10 +417,10 @@ $(document).ready(async () => {
     //see the district withouth nighthoods
     await getNightboors(linknighthoods);
     //calculate risk data and save it    
-    await getRisk(linkrisk);
     progressbar("60%","Calculating risk data....")
-    await getAffData(linkaff);
+    await getRisk(linkrisk);
     progressbar("80%","Calculating affortable data....")
+    await getAffData(linkaff);
     progressbar("90%","Still calculating....")
     progressbar("99%","Ready")
     setTimeout(() => {
