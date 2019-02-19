@@ -26,8 +26,10 @@ let bar = $("#floatbar")
 let riskslider = $("#riskslider")
 let affslider =$("#afforslider")
 let disslider =$("#distanceslider")
-
-
+let table = $("#tablebody")
+let $holetable =$(".table")
+let youcan = false
+let csvbutton = $("#savecsv")
 
 
 //-------------------------------map global variables-------------------
@@ -105,7 +107,11 @@ async function getGeoData(url) {
                         distance:0,
                         promaff:[],
                         promaffn:0,
-                        type
+                        type,
+                        points:0, 
+                        dpoints :0,
+                        apoints :0,
+                        rpoints:0
                     }
                 })
                 console.log("geoshapes saved")
@@ -237,6 +243,7 @@ async function getRisk(url){
                     
                 //ready and go back
                 console.log("risk ready");
+                youcan = true;
                 resolve("ready");
             });
             
@@ -256,7 +263,7 @@ async function getAffData(url){
                 affdata = affdata.data
                 console.log("start")
                 let sum,avg;
-                yieldingLoop(affdata.length,10,(i) =>{
+                yieldingLoop(affdata.length,20,(i) =>{
                     if(affdata[i][23] != null){
                         const jsoncoods = {"lat":parseFloat(affdata[i][23]),"lng":parseFloat(affdata[i][24])};
                         //calculate the ponderate average
@@ -277,7 +284,11 @@ async function getAffData(url){
                             });
                         }
                     }   
-                },()=>{console.log("finish");});                    
+                },()=>{
+                    alert("enjoy the full experience")
+                    calculateProms();   
+                    console.log("finish");
+                });                    
                 //calculateProms();
                 resolve("ready")
             });
@@ -289,12 +300,20 @@ function calculateProms(){
     for(j in districts){
         let arr = districts[j].promaff
         if(arr.length){
-            sum = arr.reduce(function(a, b) { return a + b; });
+            sum = arr.reduce(function(a, b) { 
+                if(!isNaN(a) && !isNaN(b)){
+                    return a + b; 
+                }else{
+                    return 0
+                }
+            });
             avg = sum / arr.length;
             districts[j].promaffn = avg
         }
     }
 }
+
+
 
 
 
@@ -309,8 +328,10 @@ disslider.change((event)=>{
     dis = parseInt(event.target.value);
     if(parseInt(risk)===0 && parseInt(aff) ===0 && parseInt(dis) != 0){
         drawDistance(dis)
-    }else{
+    }else if(parseInt(risk) ===0 && parseInt(aff) ===0 && parseInt(dis) === 0){
         defaultdraw();
+    }else{
+        drawAll()
     }
 })
 //draw the distance 
@@ -337,6 +358,7 @@ function drawDistance(value){
             });
         });
     }
+    if(youcan){calculatetable()}
 }
 
 
@@ -347,8 +369,10 @@ riskslider.change((event) =>{
     //draw just risk
     if(parseInt(risk) !=0 && parseInt(aff) ===0 && parseInt(dis) === 0){
         drawRisk(risk)
-    }else{
+    }else if(parseInt(risk) ===0 && parseInt(aff) ===0 && parseInt(dis) === 0){
         defaultdraw();
+    }else{
+        drawAll()
     }
 });
 
@@ -377,6 +401,7 @@ function drawRisk(value){
             });
         });
     }
+    if(youcan){calculatetable()}
 }
 
 //affort slider
@@ -386,8 +411,10 @@ affslider.change((event) =>{
     //draw just risk
     if(parseInt(risk) ===0 && parseInt(aff) !==0 && parseInt(dis) === 0){
         drawAff(aff)
-    }else{
+    }else if(parseInt(risk) ===0 && parseInt(aff) ===0 && parseInt(dis) === 0){
         defaultdraw();
+    }else{
+        drawAll()
     }
 });
 
@@ -417,13 +444,152 @@ function drawAff(value){
             });
         });
     }
+    if(youcan){calculatetable()}
 }   
 
+//-----------------------------------STANDART DATA---------------------------------
+function standartdis(data,type){
+    if(type == "inverse"){
+        return (data*3)
+    }else{
+        return (1 - (data * 3))
+    }
+}
+function standartrisk(data,type){
+    if(type == "inverse"){
+        return (data/60)
+    }else{
+        return (1 - (data/60))
+    }
+}
+function standartaff(data,type){
+    if(type == "inverse"){
+        return (data/2)
+    }else{
+        return (1 - (data/2))
+    }
+}
 
+//----------------------------------table------------------------------------------
 
+function calculatetable(){
+    for(i in districts){
+        let p=0;
+        let ap=0,rp=0,dp=0;
+        //risk
+        if(risk ===1){
+            rp = 1000*(standartrisk(districts[i].crimes,"normal"));
+        }else if(risk ===-1){
+            rp = 1000*(standartrisk(districts[i].crimes,"inverse"));
+        }
+        //distance 
+        if(dis ===1){
+            dp = 1000*(standartdis(districts[i].distance,"normal"));
+        }else if(dis ===-1){
+            dp = 1000*(standartrisk(districts[i].distance,"inverse"));
+        }
+        //affort
+        if(aff ===1){
+            ap = 1000*(standartrisk(districts[i].promaffn,"normal"));
+        }else if(aff ===-1){
+            ap = 1000*(standartrisk(districts[i].promaffn,"inverse"));
+        }
+        p = ap + rp + dp
+        districts[i].points = p
+        districts[i].dpoints =dp
+        districts[i].apoints =ap
+        districts[i].rpoints=rp
+    }
+    filltable();
+}
 
+function filltable(){
+    var sortable = [];
+        for (var distric in districts) {
+            sortable.push([distric, districts[distric]["points"]]);
+        }
+    sortable.sort(function (a, b) {
+        return a[1] - b[1];
+    }).reverse();
+    //console.log(sortable);
+    table.html("")
+    for(let o=1;o<11;o++){
+        let dis = districts[sortable[o][0]]
+        table.append(
+            "<tr><th scope='row'>" + o + "</th> <td>District " + sortable[o][0] + "</td> " + "<td>" + dis["dpoints"] + "</td>"+"<td>" + dis["rpoints"] + "</td>"+ "<td>" + dis["apoints"] + "</td>"+"<td>" + dis["points"] + "</td>"+"</tr>"
+        );
+    }
+    
+}
 
+function download_csv(csv, filename) {
+    var csvFile;
+    var downloadLink;
+
+    // CSV FILE
+    csvFile = new Blob([csv], {type: "text/csv"});
+
+    // Download link
+    downloadLink = document.createElement("a");
+
+    // File name
+    downloadLink.download = filename;
+
+    // We have to create a link to the file
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+
+    // Make sure that the link is not displayed
+    downloadLink.style.display = "none";
+
+    // Add the link to your DOM
+    document.body.appendChild(downloadLink);
+
+    // Lanzamos
+    downloadLink.click();
+}
+
+function export_table_to_csv(html, filename) {
+	var csv = [];
+	var rows = document.querySelectorAll("table tr");
+	
+    for (var i = 0; i < rows.length; i++) {
+		var row = [], cols = rows[i].querySelectorAll("td, th");
+		
+        for (var j = 0; j < cols.length; j++) 
+            row.push(cols[j].innerText);
+        
+		csv.push(row.join(","));		
+	}
+
+    // Download CSV
+    download_csv(csv.join("\n"), filename);
+}
+
+csvbutton.click(function () {
+    var html = document.querySelector("table").outerHTML;
+    export_table_to_csv(html, "table.csv");
+});
 //------------------------------- for all ---------------------------------------
+function drawAll(){
+    if(youcan){calculatetable()}
+    for(i in districts){
+        //get the crimes by district
+        let pol = districts[i].poligs;
+        let inten = districts[i].points/2808;
+        pol.forEach((poligon) => {
+            poligon.setOptions({
+                strokeColor: "white",
+                strokeOpacity: 0.8,
+                strokeWeight: 1,
+                fillColor: "#12A9FF",
+                fillOpacity: inten
+            });
+        });
+    }
+}
+
+
+
 //back to normal
 function defaultdraw(){
     for(i in districts){
@@ -438,6 +604,7 @@ function defaultdraw(){
             });
         });
     }
+    
 }
 
 //-------------------------------------------utils------------------------------------
@@ -467,6 +634,19 @@ function yieldingLoop(count, chunksize, callback, finished) {
     })();
 }
 
+
+function attachPolygonInfoWindow(polygon,name) {
+    var infoWindow = new google.maps.InfoWindow();
+    google.maps.event.addListener(polygon, 'mouseover', function (e) {
+        infoWindow.setContent(name);
+        var latLng = e.latLng;
+        infoWindow.setPosition(latLng);
+        infoWindow.open(map);
+    });
+    google.maps.event.addListener(polygon, 'mouseout', function (e) {
+        infoWindow.close(map);
+    });
+}
 
 //---------------------------------------start function----------------------------------
 

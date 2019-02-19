@@ -54,7 +54,7 @@ body{
   background-color: #1DFF93;
 }
 .footer{
-  height:50%;
+  height:40%;
   width:100%;
   position:absolute;
   bottom:0;
@@ -63,6 +63,17 @@ body{
   position:absolute;
   bottom:0; 
   left:7%;
+}
+.blockquote{
+  margin-top: 20%;
+  font-size: 1rem;
+}
+.blockquote p{
+  font-size: .8rem;
+}
+.blockquote footer{
+  color: whitesmoke;
+  font-size: .6rem;
 }
 .infodisplay{
   width:78%;
@@ -79,15 +90,14 @@ body{
   width:100%;
   height:100%;
 }
-.sub-showdata{
-  width:30%;
-  padding:2%;
-}
 .sub-showdata-table{
-  width:70%;
-  padding:2%;
+  width:100%;
+  padding:0%;
   height: 100%;
   overflow-y: scroll;
+}
+#savecsv{
+  margin-left: 80%;
 }
 tablea{
   color:#007bff;

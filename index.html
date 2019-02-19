@@ -65,7 +65,10 @@
                     <input type="checkbox" class="custom-control-input" id="customSwitch2" />
                     <label class="custom-control-label" for="customSwitch2">Show farmer markers</label>
                 </div>
-                <button type="submit" class="btn btn-primary">Show</button>
+                <blockquote class="blockquote">
+                    <p class="mb-0">"Patience is bitter, but its fruit is sweet."</p>
+                    <footer class="blockquote-footer">Jean-Jacques Rousseau </footer>
+                </blockquote>
             </form>
             <div class="footer">
                 <div class="instructions">
@@ -90,13 +93,17 @@
                             <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">District</th>
-                                <th scope="col">Points</th>
+                                <th scope="col">Points Distance</th>
+                                <th scope="col">Points Risk</th>
+                                <th scope="col">Points Affortable</th>
+                                <th scope="col">Total</th>
                             </tr>
                         </thead>
                         <tbody id="tablebody">
                             
                         </tbody>
                     </table>
+                    <button type="button" class="btn btn-primary" id="savecsv">Save table as csv</button>
                 </div>
             </div>
         </div>
