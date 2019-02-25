@@ -17,31 +17,43 @@
 
 <body>
     <div class="maincontainer">
+        <div class="floatchargin" id="floatbar">
+            Charging, please be pacient....
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" id="progressbarmap"  aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <p id="textchargin">
+
+            </p>
+        </div>
         <div class="controlbar">
             <img src="http://www.stern.nyu.edu/sites/all/themes/stern/images/logo.nyu-stern.450.png" id="logo">
             </img>
             <form class="input-form">
                 <div class="form-group">
                     <label for="riskslider">Risk</label>
-                    <input type="range" class="custom-range slider" id="riskslider" value="0" min="0" max="3" step="1"/>
+                    <input type="range" class="custom-range slider" id="riskslider" value="0" min="-1" max="1" step="1"/>
                     <div class="sliderdiv">
                         <span>Risky</span>
+                        <span>Don't care</span>
                         <span>Safer</span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="distanceslider">Distance</label>
-                    <input type="range" class="custom-range slider" id="distanceslider" value="0" min="0" max="3" step="1" />
+                    <input type="range" class="custom-range slider" id="distanceslider" value="0" min="-1" max="1" step="1" />
                     <div class="sliderdiv">
                         <span>Far Away</span>
+                        <span>Don't care</span>
                         <span>Closer</span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="afforslider">Affordable</label>
-                    <input type="range" class="custom-range slider" id="afforslider" value="0" min="0" max="3" step="1" />
+                    <input type="range" class="custom-range slider" id="afforslider" value="0" min="-1" max="1" step="1" />
                     <div class="sliderdiv">
                         <span>Expensive</span>
+                        <span>Don't care</span>
                         <span>Cheaper</span>
                     </div>
                 </div>
@@ -53,7 +65,10 @@
                     <input type="checkbox" class="custom-control-input" id="customSwitch2" />
                     <label class="custom-control-label" for="customSwitch2">Show farmer markers</label>
                 </div>
-                <button type="submit" class="btn btn-primary">Show</button>
+                <blockquote class="blockquote">
+                    <p class="mb-0">"Patience is bitter, but its fruit is sweet."</p>
+                    <footer class="blockquote-footer">Jean-Jacques Rousseau </footer>
+                </blockquote>
             </form>
             <div class="footer">
                 <div class="instructions">
@@ -78,13 +93,17 @@
                             <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">District</th>
-                                <th scope="col">Points</th>
+                                <th scope="col">Points Distance</th>
+                                <th scope="col">Points Risk</th>
+                                <th scope="col">Points Affortable</th>
+                                <th scope="col">Total</th>
                             </tr>
                         </thead>
                         <tbody id="tablebody">
                             
                         </tbody>
                     </table>
+                    <button type="button" class="btn btn-primary" id="savecsv">Save table as csv</button>
                 </div>
             </div>
         </div>
@@ -96,18 +115,13 @@
     <!--My own js-->
     <script src="./js/main.js"></script>
     <script src="./js/map.js"></script>
-    
+
     
     <!-- Google Maps -->
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAD5EdEsOiH37NAO6voM3pZiTanOshSoHw&callback=onGoogleMapResponse"></script>
     <!-- map2 -->
     <!-- <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6YeNUtrmSRloKw8YGyh7SNLyjxdtD52w&callback=onGoogleMapResponse"></script> -->
     <!--<script src="./js/visualization.js"></script>-->
-
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <!--<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>-->
 </body>
 
 </html>

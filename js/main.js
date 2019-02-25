@@ -1,25 +1,48 @@
+//--------------------------global variables-------------------------
+//datasets
 const linkpoligons = "https://services5.arcgis.com/GfwWNkhOj9bNBqoJ/arcgis/rest/services/nycd/FeatureServer/0/query?where=1=1&outFields=*&outSR=4326&f=geojson"
 const linkrisk = "https://data.cityofnewyork.us/resource/9s4h-37hy.json?cmplnt_fr_dt=2015-12-31T00:00:00.000"
 const linkaff = "https://data.cityofnewyork.us/api/views/hg8x-zxpr/rows.json?accessType=DOWNLOAD"
-//const nottoshow = [58, 29, 65, 64, 20, 66, 67, 9, 39, 14]
-//const nottoshow = [55, 62, 27, 61, 18, 63, 64, 8, 12, 36, 29]
-var districts = {};
-let crimes = [];
-//let wachapanda ={1: 6, 2: 15, 3: 11, 4: 9, 5: 16, 6: 21, 7: 13, 8: 1, 9: 30, 10: 13, 11: 11, 12: 0, 13: 13, 14: 30, 15: 9, 16: 24, 17: 20, 18: 0, 19: 8, 20: 22, 21: 41, 22: 15, 23: 13, 24: 37, 25: 25, 26: 10, 27: 2, 28: 19, 29: 0, 30: 14, 31: 12, 32: 32, 33: 9, 34: 9, 35: 14, 36: 0, 37: 23, 38: 0, 39: 20, 40: 15, 41: 6, 42: 13, 43: 18, 44: 7, 45: 25, 46: 19, 47: 20, 48: 12, 49: 33, 50: 14, 51: 21, 52: 18, 53: 18, 54: 24, 55: 2, 56: 21, 57: 10, 58: 5, 59: 15, 60: 7, 61: 0, 62: 0, 63: 0, 64: 1, 65: 12, 66: 12, 67: 16, 68: 7, 69: 25, 70: 23, 71: 14}
-var poligons = {};
-let poglo;
-var map;
-var mappoligons = [];
-var mapmarkers = [];
+const linknighthoods = "https://data.cityofnewyork.us/api/views/xyye-rtrs/rows.json?accessType=DOWNLOAD"
+//extra
+const linkgalleries = "https://data.cityofnewyork.us/api/views/43hw-uvdj/rows.json?accessType=DOWNLOAD"
+const linkmuseums = "https://data.cityofnewyork.us/api/views/fn6f-htvy/rows.json?accessType=DOWNLOAD"
+
+
+// position of the university
 var upos = {
     "lat": 40.729364,
     "lng": -73.996480
 };
-var risk = 0;
-var dis = 0;
-var aff = 0;
+var districts = {};
 
-var colors = ["#6900FF", "#9954FF", "#BD93FF", "#FFCE1A", "#FFD546","#FFE282","#1DFF93","#7AFFBD","#D1FFEB"]
+
+
+//elements from html
+
+let chargebar = $("#progressbarmap");
+let pcharge = $("#textchargin");
+let bar = $("#floatbar")
+let riskslider = $("#riskslider")
+let affslider =$("#afforslider")
+let disslider =$("#distanceslider")
+let table = $("#tablebody")
+let $holetable =$(".table")
+let youcan = false
+let csvbutton = $("#savecsv")
+
+
+//-------------------------------map global variables-------------------
+var map;
+var mappoligons = [];
+var mapmarkers = [];
+var colors = [ "#BD93FF", "#9954FF","#0097B2", "#FFE282", "#FFD546","#FFCE1A",  "#D1FFEB", "#7AFFBD","#1DFF93"];
+var discolors = ["#6900FF","#FF7400"];
+var riskcolors = ["#FFE300","#3000FF"];
+var affcolors =["#51FF00","#FF00F3"]
+var boros = ["Manhattan", "Brooklyn", "Queens", "Staten Island", "Bronx"]
+
+//--------------------------------front animations---------------------------
 //scroll down
 $("#tablebutton").click(function () {
     $('.infodisplay').animate({
@@ -35,314 +58,567 @@ $("#mapbutton").click(function () {
         "slow");
 });
 
-async function getDatageo(url) {
-    let datafull;
-    let data = $.get(url, () => {})
-        .done(() => {
-            let tem = JSON.parse(data.responseText).features;
-            poglo = tem
-            for (i in tem) {
-                    let coords = tem[i]["geometry"]["coordinates"]
-                    let jsoncoods = []
-                    let type ="Polygon"
-                    if (coords.length ===1) {
-                        let coords = tem[i]["geometry"]["coordinates"][0]
-                        coords.forEach((element) => {
-                            jsoncoods.push({
-                                "lat": element[1],
-                                "lng": element[0]
-                            })
-                        })
-                    } else {
-                        let coords = tem[i]["geometry"]["coordinates"]
-                        type = "Multipolygon"
-                        coords.forEach((element) => {
-                            let jarr = []
-                            element.forEach((e) => {
-                                e.forEach((v) =>{
-                                    jarr.push({
-                                        "lat": v[1],
-                                        "lng": v[0]
-                                    })
-                                })
-                                    
-                            });
-                            jsoncoods.push(jarr)
-                        })
-                    }
-                    poligons[i] = {
-                        "id": tem[i]["id"],
-                        "type": type,
-                        "coords": jsoncoods,
-                    }
-                    districts[i] = {
-                        "boro": (tem[i]["properties"]["BoroCD"] - (tem[i]["properties"]["BoroCD"] % 100)) / 100,
-                        "code":tem[i]["properties"]["BoroCD"],
-                        "crimes":0,
-                        "projects":0
-                    }
-                }
-        });
-    return new Promise(resolve => {
+
+//---------------------------------------sliders variables----------------------------
+var risk = 0;
+var dis = 0;
+var aff = 0;
+
+
+//--------------------------------------data analisis---------------------------------
+
+//-------------------------------------poligons--------------------------------------
+//get the poligons
+async function getGeoData(url) {
+    //try to wait until charge 
+    return new Promise((resolve,reject) => {
         setTimeout(() => {
-            resolve("yess");
-        }, 1500);
+            //get the data
+            let data = $.get(url, () => {
+                //success
+                console.log("geo data gotten")
+            }).done(() => {
+                //parse the json
+                let datajson = JSON.parse(data.responseText).features;
+                //log to revision
+                // console.log(datajson)
+                //convert to poligons
+                datajson.forEach((element) => {
+                    //the the coords to create a poligon
+                    let type = element["geometry"]["type"]
+                    let coords = getbounds(element["geometry"]["coordinates"],type);
+                    //get the id
+                    let id = element.id;
+                    //get the boro cd and code
+                    let borocd = element.properties.BoroCD
+                    //get the boro for the array
+                    let boro = Math.floor(borocd / 100) - 1
+                    //put the info in the general datastructure
+                    districts[id] = {
+                        id,
+                        borocd,
+                        boro,
+                        coords,
+                        poligs:[],
+                        crimes:[],
+                        nightboors:[],
+                        nnighboors:0,
+                        center:{},
+                        distance:0,
+                        promaff:[],
+                        promaffn:0,
+                        type,
+                        points:0, 
+                        dpoints :0,
+                        apoints :0,
+                        rpoints:0
+                    }
+                })
+                console.log("geoshapes saved")
+                resolve("geo data saved")
+            })
+            
+        }, 100);
+    })
+
+}
+//get the coords for  the poligon
+function getbounds(jsonelement,type) {
+    //variables to save 
+    let coordsarr = [];
+    let jsoncoods = {};
+    let subarr;
+    //round the array of coords 
+    jsonelement.forEach((arr) => {
+        let arrfor=arr;
+        if(type != "Polygon"){
+            arrfor = arr[0]
+        }
+            subarr = []
+            arrfor.forEach((coords) => {
+                //transform on latlng objects
+                jsoncoods = {
+                    "lat": coords[1],
+                    "lng": coords[0]
+                }
+                //save it
+                subarr.push(jsoncoods)
+            })
+            //save it
+            coordsarr.push(subarr);
+    });
+    //return the final array
+    return coordsarr;
+}
+
+//---------------------------------------------nighboors----------------------------------
+
+async function getNightboors(url){
+    return new Promise((resolve,reject)=>{
+        setTimeout(() => {
+            let data = $.get(url,()=>{
+                console.log("neighbors gotten");
+            })
+            .done(()=>{
+                let jsondata = JSON.parse(data.responseText).data
+                let coords;
+                console.log("start calculations")
+                jsondata.forEach((element)=>{
+                    //get the coords
+                    coords = element[8].replace("(","").replace(")","").split(" ")
+                    coords = {
+                        "lat":parseFloat(coords[2]),
+                        "lng":parseFloat(coords[1])
+                    }
+                    //log for districts without nightboors 
+                    for(i in districts){
+                        districts[i].poligs.forEach((pol)=>{
+                            if(isinPolygon(coords,pol)){
+                                //add the nightboors info
+                                districts[i].nightboors.push(coords);
+                                districts[i].nnighboors++;
+                            }
+                        })
+                    }
+                })
+                //delete the districts without inportance
+                cleandistricts();
+                calculateDistances();
+                console.log("done clear")
+                resolve("ready")
+            })
+        }, 100);
     });
 }
-async function getDatarisk(url){
-    let data = $.get(url)
-        .done(()  => {
-            let tem = JSON.parse(data.responseText);
-            // for(i in districts){
-            //     districts[i]["crimes"] = wachapanda[districts[i].id];
-            // }
-            // for (j in districts){
-            //     wachapanda[districts[j].id] = 0
-            // }
-            var coordinate;
-            var coords;
-            var jsoncoods;
-            //alert("please wait...")
-            yieldingLoop(tem.length,10,(i)=>{
-                let coords = tem[i]["lat_lon"]["coordinates"]
-                let jsoncoods = {"lat":coords[1],"lng":coords[0]};
-                coordinate = new google.maps.LatLng(jsoncoods);//replace with your lat and lng values
-                //console.log(i)
-                for(j in districts){
-                    districts[j]["poligs"].forEach((e)=>{
-                        var isWithinPolygon = google.maps.geometry.poly.containsLocation(coordinate, mappoligons[e]);
-                        if(isWithinPolygon){
-                            districts[j].crimes++;
-                        }
-                    });
-                }
-            },()=>{alert("done")})
-            //     for(let i =0;i<tem.length;i++){
-            //         let coords = tem[i]["lat_lon"]["coordinates"]
-            //         let jsoncoods = {"lat":coords[1],"lng":coords[0]};
-            //         coordinate = new google.maps.LatLng(jsoncoods);//replace with your lat and lng values
-            //         //console.log(i)
-            //         for(j in districts){
-            //             districts[j]["poligs"].forEach((e)=>{
-            //                 var isWithinPolygon = google.maps.geometry.poly.containsLocation(coordinate, mappoligons[e]);
-            //                 if(isWithinPolygon){
-            //                     districts[j].crimes++;
-            //                 }
-            //             });
-            //         }
-            //     }
-            // alert("done")
-        });
-        return new Promise(resolve => {
-            setTimeout(() => {
-                resolve("yess");
-            }, 1500);
-        });
+//func  tion to delete the districts without nightboors
+function cleandistricts(){
+    for(i in districts){
+        if(districts[i].nnighboors ===0){
+            //delete from the map and data structure
+            districts[i].poligs.forEach((pol)=>{
+                pol.setMap(null)
+                delete districts[i]
+            });
+        }
+    }
 }
-async function getDataaff(url){
-    let data = $.get(url)
-        .done(() =>{
-            let tem = JSON.parse(data.responseText)["data"];
-            let coords;
-            let jsoncoords;
-            //let projects=[]
-            yieldingLoop(tem.length,10,(i)=>{
-                coords = [parseFloat(tem[i][23]),parseFloat(tem[i][24])];
-                if(coords[0] != null){
-                    jsoncoords = {"lat":coords[0],"lng":coords[1]}
-                    coordinate = new google.maps.LatLng(jsoncoords);//replace with your lat and lng values
-                    for(j in districts){
-                        districts[j]["poligs"].forEach((e)=>{
-                            var isWithinPolygon = google.maps.geometry.poly.containsLocation(coordinate, mappoligons[e]);
-                            //console.log(isWithinPolygon)
-                            if(isWithinPolygon){
-                                districts[j].projects++;
-                            }
-                        });
-                    }
-                    //projects.push(jsoncoords);
-                }
-            },() => {alert("done2")})
-            // for(let i =0;i<tem.length;i++){
-            //     coords = [tem[i][23],tem[i][24]];
-            //     if(coords[0] != null){
-            //         jsoncoords = {"lat":coords[0],"lng":coords[1]}
-            //         coordinate = new google.maps.LatLng(jsoncoords);
-            //         for(j in districts){
-            //             districts[j]["poligs"].forEach((e)=>{
-            //                 var isWithinPolygon = google.maps.geometry.poly.containsLocation(coordinate, mappoligons[e]);
-            //                 if(isWithinPolygon){
-            //                     districts[j].projects++;
-            //                 }
-            //             });
-            //         }
-            //         projects.push(jsoncoords);
-            //     }
-            // }
-            //  console.log(projects)
-        });
-}
+
 function calculateDistances() {
+    //calculate distances from the centers
     for (i in districts) {
         let sumlat = districts[i].center.lat - upos.lat;
         let sumlng = districts[i].center.lng - upos.lng;
         let distance = Math.sqrt((sumlat ** 2) + (sumlng ** 2))
+        // add it to the object
         districts[i]["distance"] = distance
     }
 }
 
-//slider
-$("#afforslider").change((event) => {
-    aff = event.target.value;
-});
-$("#riskslider").change((event) => {
-    risk = event.target.value;
-    if (parseInt(aff) === 0 && parseInt(dis) === 0) {
-        if (event.target.value == 3) {
-            for (i in districts) {
-                let pol = districts[i].poligs;
-                let d = districts[i].crimes
-                pol.forEach((poligon) => {
-                    mappoligons[poligon].setOptions({
-                        strokeColor: "white",
-                        strokeOpacity: 0.8,
-                        strokeWeight: 1,
-                        fillColor: colors[3],
-                        fillOpacity: 1 - (d/60)
-                    });
-                });
 
-            }
-        }else if (event.target.value == 2) {
-            for (i in districts) {
-                let pol = districts[i].poligs;
-                let d = districts[i].crimes
-                pol.forEach((poligon) => {
-                    mappoligons[poligon].setOptions({
-                        strokeColor: "white",
-                        strokeOpacity: 0.8,
-                        strokeWeight: 1,
-                        fillColor: colors[4],
-                        fillOpacity: 1 - (d/60)
-                    });
-                });
-            }
-        } else if (event.target.value == 1) {
-            for (i in districts) {
-                let pol = districts[i].poligs;
-                let d = districts[i].crimes
-                pol.forEach((poligon) => {
-                    mappoligons[poligon].setOptions({
-                        strokeColor: "white",
-                        strokeOpacity: 0.8,
-                        strokeWeight: 1,
-                        fillColor: colors[5],
-                        fillOpacity: 1 - (d/60)
-                    });
-                });
-            }
-        } else {
-            mappoligons.forEach((element) => {
-                element.setOptions({
-                    strokeColor: '#C29CFF',
-                    strokeOpacity: 0.8,
-                    strokeWeight: 2,
-                    fillColor: '#C29CFF',
-                    fillOpacity: 0.35
-                });
+//------------------------------------------risk------------------------------------
+async function getRisk(url){
+    return new Promise((resolve,reject)=>{
+        setTimeout(() => {
+            let data = $.get(url,()=>{
+                console.log("Risk data down");
             })
+            .done(()=>{
+                //parse the data
+                let riskdata = JSON.parse(data.responseText);
+                yieldingLoop(riskdata.length,10,(i)=>{
+                    //get the coords of the crime 
+                    let coords = riskdata[i]["lat_lon"]["coordinates"]
+                    //create latlng object
+                    let jsoncoods = {"lat":coords[1],"lng":coords[0]};
+                    //add the crime to the data structure
+                    for(j in districts){
+                        districts[j]["poligs"].forEach((e)=>{
+                            if(isinPolygon(jsoncoods,e)){
+                                //saved on the district
+                                districts[j].crimes++;
+                            }
+                        });
+                    }
+                })
+                    
+                //ready and go back
+                console.log("risk ready");
+                youcan = true;
+                resolve("ready");
+            });
+            
+            
+        },100);
+    });
+    
+}
+
+//----------------------------------------------- affordable -----------------------------------------------------
+async function getAffData(url){
+    return new Promise((resolve,reject) =>{
+        let data = $.get(url,()=>{console.log("getting affort data")})
+            .done(()=>{
+                let affdata = JSON.parse(data.responseText);
+                // console.log(affdata.meta.view.columns);
+                affdata = affdata.data
+                console.log("start")
+                let sum,avg;
+                yieldingLoop(affdata.length,20,(i) =>{
+                    if(affdata[i][23] != null){
+                        const jsoncoods = {"lat":parseFloat(affdata[i][23]),"lng":parseFloat(affdata[i][24])};
+                        //calculate the ponderate average
+                        const total= affdata[i][31]+affdata[i][32]+affdata[i][33]+affdata[i][34]+affdata[i][35];
+                        const prom = (6*affdata[i][31] + 5*affdata[i][31]+4*affdata[i][32]+3*affdata[i][33]+2*affdata[i][34]+affdata[i][35])/total;
+                        //add the prom to the data structure
+                        //console.log(prom)
+                        for(j in districts){
+                            districts[j]["poligs"].forEach((e)=>{
+                                if(isinPolygon(jsoncoods,e)){
+                                    //saved on the district
+                                    districts[j].promaff.push(prom);
+                                    let arr = districts[j].promaff
+                                        sum = arr.reduce(function(a, b) { return a + b; });
+                                        avg = sum / arr.length;
+                                        districts[j].promaffn = avg
+                                }
+                            });
+                        }
+                    }   
+                },()=>{
+                    alert("enjoy the full experience")
+                    calculateProms();   
+                    console.log("finish");
+                });                    
+                //calculateProms();
+                resolve("ready")
+            });
+    })
+}
+
+
+function calculateProms(){
+    for(j in districts){
+        let arr = districts[j].promaff
+        if(arr.length){
+            sum = arr.reduce(function(a, b) { 
+                if(!isNaN(a) && !isNaN(b)){
+                    return a + b; 
+                }else{
+                    return 0
+                }
+            });
+            avg = sum / arr.length;
+            districts[j].promaffn = avg
         }
     }
-});
-$("#distanceslider").change((event) => {
-    dis = event.target.value;
-    if (parseInt(aff) === 0 && parseInt(risk) === 0) {
-        if (event.target.value == 3) {
-            for (i in districts) {
-                let pol = districts[i].poligs;
-                let d = districts[i].distance
-                pol.forEach((poligon) => {
-                    mappoligons[poligon].setOptions({
-                        strokeColor: "white",
-                        strokeOpacity: 0.8,
-                        strokeWeight: 1,
-                        fillColor: colors[0],
-                        fillOpacity: 1 - (d * 3)
-                    });
-                });
+}
 
-            }
-        } else if (event.target.value == 2) {
-            for (i in districts) {
-                let pol = districts[i].poligs;
-                let d = districts[i].distance
-                pol.forEach((poligon) => {
-                    mappoligons[poligon].setOptions({
-                        strokeColor: "white",
-                        strokeOpacity: 0.8,
-                        strokeWeight: 1,
-                        fillColor: colors[1],
-                        fillOpacity: 1 - (d * 3)
-                    });
-                });
-            }
-        } else if (event.target.value == 1) {
-            for (i in districts) {
-                let pol = districts[i].poligs;
-                let d = districts[i].distance
-                pol.forEach((poligon) => {
-                    mappoligons[poligon].setOptions({
-                        strokeColor: "white",
-                        strokeOpacity: 0.8,
-                        strokeWeight: 1,
-                        fillColor: colors[2],
-                        fillOpacity: 1 - (d * 4)
-                    });
-                });
-            }
-        } else {
-            mappoligons.forEach((element) => {
-                element.setOptions({
-                    strokeColor: '#C29CFF',
-                    strokeOpacity: 0.8,
-                    strokeWeight: 2,
-                    fillColor: '#C29CFF',
-                    fillOpacity: 0.35
-                });
-            })
+
+
+
+
+
+
+
+//--------------------------------------------------visualization data------------------------------------------
+
+//----------------------------------------------------distance------------------------------------------------
+//distance slider
+disslider.change((event)=>{
+    dis = parseInt(event.target.value);
+    if(parseInt(risk)===0 && parseInt(aff) ===0 && parseInt(dis) != 0){
+        drawDistance(dis)
+    }else if(parseInt(risk) ===0 && parseInt(aff) ===0 && parseInt(dis) === 0){
+        defaultdraw();
+    }else{
+        drawAll()
+    }
+})
+//draw the distance 
+function drawDistance(value){
+    for(i in districts){
+        let pol = districts[i].poligs;
+        let d = districts[i].distance;
+        let inten=0;
+        let color;
+        if(value ===1){
+            inten =  1 - (d * 3);
+            color = discolors[0];
+        }else{
+            color = discolors[1];
+            inten = (d*3)
         }
-        var sortable = [];
-        for (var distric in districts) {
-            sortable.push([distric, districts[distric]["distance"]]);
-        }
-        sortable.sort(function (a, b) {
-            return a[1] - b[1];
-        }).reverse();
-        let table = $("#tablebody");
-        let o = 1;
-        for(let i =sortable.length-1;i>=sortable.length-11;i--){
-            table.append("<tr><th scope='row'>" + o + "</th> <td>District " + sortable[i][0] + "</td> " + "<td>" + sortable[i][1] + "</td></tr>");
-            o++;
-        }        
-    } else {
-        mappoligons.forEach((element) => {
-            element.setOptions({
-                strokeColor: '#C29CFF',
+        pol.forEach((poligon) => {
+            poligon.setOptions({
+                strokeColor: "white",
                 strokeOpacity: 0.8,
-                strokeWeight: 2,
-                fillColor: '#C29CFF',
+                strokeWeight: 1,
+                fillColor: color,
+                fillOpacity: inten
+            });
+        });
+    }
+    if(youcan){calculatetable()}
+}
+
+
+//risk slider
+riskslider.change((event) =>{
+    //parse the value 
+    risk = parseInt(event.target.value);
+    //draw just risk
+    if(parseInt(risk) !=0 && parseInt(aff) ===0 && parseInt(dis) === 0){
+        drawRisk(risk)
+    }else if(parseInt(risk) ===0 && parseInt(aff) ===0 && parseInt(dis) === 0){
+        defaultdraw();
+    }else{
+        drawAll()
+    }
+});
+
+//draw risks
+function drawRisk(value){
+    for(i in districts){
+        //get the crimes by district
+        let pol = districts[i].poligs;
+        let d = districts[i].crimes;
+        let inten =0;
+        let color;
+        if(value === 1){
+            color = riskcolors[0];
+            inten = 1 - (d/60)
+        }else{
+            color = riskcolors[1]
+            inten = (d/60)
+        }
+        pol.forEach((poligon) => {
+            poligon.setOptions({
+                strokeColor: "white",
+                strokeOpacity: 0.8,
+                strokeWeight: 1,
+                fillColor: color,
+                fillOpacity: inten
+            });
+        });
+    }
+    if(youcan){calculatetable()}
+}
+
+//affort slider
+affslider.change((event) =>{
+    //parse the value 
+    aff = parseInt(event.target.value);
+    //draw just risk
+    if(parseInt(risk) ===0 && parseInt(aff) !==0 && parseInt(dis) === 0){
+        drawAff(aff)
+    }else if(parseInt(risk) ===0 && parseInt(aff) ===0 && parseInt(dis) === 0){
+        defaultdraw();
+    }else{
+        drawAll()
+    }
+});
+
+
+//draw
+function drawAff(value){
+    for(i in districts){
+        //get the crimes by district
+        let pol = districts[i].poligs;
+        let d = districts[i].promaffn;
+        let color;
+        let inten;
+        if(value ===1){
+            color = affcolors[0];
+            inten = d/2;
+        }else{
+            color = affcolors[1];
+            inten = 1-d/2;
+        }
+        pol.forEach((poligon) => {
+            poligon.setOptions({
+                strokeColor: "white",
+                strokeOpacity: 0.8,
+                strokeWeight: 1,
+                fillColor: color,
+                fillOpacity: inten
+            });
+        });
+    }
+    if(youcan){calculatetable()}
+}   
+
+//-----------------------------------STANDART DATA---------------------------------
+function standartdis(data,type){
+    if(type == "inverse"){
+        return (data*3)
+    }else{
+        return (1 - (data * 3))
+    }
+}
+function standartrisk(data,type){
+    if(type == "inverse"){
+        return (data/60)
+    }else{
+        return (1 - (data/60))
+    }
+}
+function standartaff(data,type){
+    if(type == "inverse"){
+        return (data/2)
+    }else{
+        return (1 - (data/2))
+    }
+}
+
+//----------------------------------table------------------------------------------
+
+function calculatetable(){
+    for(i in districts){
+        let p=0;
+        let ap=0,rp=0,dp=0;
+        //risk
+        if(risk ===1){
+            rp = 1000*(standartrisk(districts[i].crimes,"normal"));
+        }else if(risk ===-1){
+            rp = 1000*(standartrisk(districts[i].crimes,"inverse"));
+        }
+        //distance 
+        if(dis ===1){
+            dp = 1000*(standartdis(districts[i].distance,"normal"));
+        }else if(dis ===-1){
+            dp = 1000*(standartrisk(districts[i].distance,"inverse"));
+        }
+        //affort
+        if(aff ===1){
+            ap = 1000*(standartrisk(districts[i].promaffn,"normal"));
+        }else if(aff ===-1){
+            ap = 1000*(standartrisk(districts[i].promaffn,"inverse"));
+        }
+        p = ap + rp + dp
+        districts[i].points = p
+        districts[i].dpoints =dp
+        districts[i].apoints =ap
+        districts[i].rpoints=rp
+    }
+    filltable();
+}
+
+function filltable(){
+    var sortable = [];
+        for (var distric in districts) {
+            sortable.push([distric, districts[distric]["points"]]);
+        }
+    sortable.sort(function (a, b) {
+        return a[1] - b[1];
+    }).reverse();
+    //console.log(sortable);
+    table.html("")
+    for(let o=1;o<11;o++){
+        let dis = districts[sortable[o][0]]
+        table.append(
+            "<tr><th scope='row'>" + o + "</th> <td>District " + sortable[o][0] + "</td> " + "<td>" + dis["dpoints"] + "</td>"+"<td>" + dis["rpoints"] + "</td>"+ "<td>" + dis["apoints"] + "</td>"+"<td>" + dis["points"] + "</td>"+"</tr>"
+        );
+    }
+    
+}
+
+function download_csv(csv, filename) {
+    var csvFile;
+    var downloadLink;
+
+    // CSV FILE
+    csvFile = new Blob([csv], {type: "text/csv"});
+
+    // Download link
+    downloadLink = document.createElement("a");
+
+    // File name
+    downloadLink.download = filename;
+
+    // We have to create a link to the file
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+
+    // Make sure that the link is not displayed
+    downloadLink.style.display = "none";
+
+    // Add the link to your DOM
+    document.body.appendChild(downloadLink);
+
+    // Lanzamos
+    downloadLink.click();
+}
+
+function export_table_to_csv(html, filename) {
+	var csv = [];
+	var rows = document.querySelectorAll("table tr");
+	
+    for (var i = 0; i < rows.length; i++) {
+		var row = [], cols = rows[i].querySelectorAll("td, th");
+		
+        for (var j = 0; j < cols.length; j++) 
+            row.push(cols[j].innerText);
+        
+		csv.push(row.join(","));		
+	}
+
+    // Download CSV
+    download_csv(csv.join("\n"), filename);
+}
+
+csvbutton.click(function () {
+    var html = document.querySelector("table").outerHTML;
+    export_table_to_csv(html, "table.csv");
+});
+//------------------------------- for all ---------------------------------------
+function drawAll(){
+    if(youcan){calculatetable()}
+    for(i in districts){
+        //get the crimes by district
+        let pol = districts[i].poligs;
+        let inten = districts[i].points/2808;
+        pol.forEach((poligon) => {
+            poligon.setOptions({
+                strokeColor: "white",
+                strokeOpacity: 0.8,
+                strokeWeight: 1,
+                fillColor: "#12A9FF",
+                fillOpacity: inten
+            });
+        });
+    }
+}
+
+
+
+//back to normal
+function defaultdraw(){
+    for(i in districts){
+        let pol = districts[i].poligs;        
+        pol.forEach((poligon) => {
+            poligon.setOptions({
+                strokeColor: "#C29CFF",
+                strokeOpacity: 0.8,
+                strokeWeight: 1,
+                fillColor: "#C29CFF",
                 fillOpacity: 0.35
             });
-        })
+        });
     }
+    
+}
 
-});
+//-------------------------------------------utils------------------------------------
+function progressbar(value,text){
+    pcharge.text(text);
+    chargebar.css("width",value);
+    if(value === "100%"){
+        bar.remove();
+    }
+}
 
 
-
-
-//utils
 //taken from https://stackoverflow.com/questions/26615966/how-to-make-non-blocking-javascript-code
+//processing on blocks
 function yieldingLoop(count, chunksize, callback, finished) {
     var i = 0;
     (function chunk() {
@@ -357,3 +633,41 @@ function yieldingLoop(count, chunksize, callback, finished) {
         }
     })();
 }
+
+
+function attachPolygonInfoWindow(polygon,name) {
+    var infoWindow = new google.maps.InfoWindow();
+    google.maps.event.addListener(polygon, 'mouseover', function (e) {
+        infoWindow.setContent(name);
+        var latLng = e.latLng;
+        infoWindow.setPosition(latLng);
+        infoWindow.open(map);
+    });
+    google.maps.event.addListener(polygon, 'mouseout', function (e) {
+        infoWindow.close(map);
+    });
+}
+
+//---------------------------------------start function----------------------------------
+
+$(document).ready(async () => {
+    //get and shave the poligons 
+    progressbar("0%","Charging poligons...")
+    await getGeoData(linkpoligons);
+    progressbar("20%","Drawing poligons...")
+    //show the poligons 
+    await drawPolygons();
+    progressbar("40%","Getting nightboors and calculating distances...")
+    //see the district withouth nighthoods
+    await getNightboors(linknighthoods);
+    //calculate risk data and save it    
+    progressbar("60%","Calculating risk data....")
+    getRisk(linkrisk);
+    progressbar("80%","Calculating affortable data....")
+    getAffData(linkaff);
+    progressbar("90%","Still calculating....")
+    progressbar("99%","Ready")
+    setTimeout(() => {
+        progressbar("100%")
+    }, 200);
+});
