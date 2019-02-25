@@ -549,6 +549,7 @@ function drawAll(){
         //get the crimes by district
         let pol = districts[i].poligs;
         let inten = districts[i].points/2808;
+        //let inten = districts[i].points/1606;
         pol.forEach((poligon) => {
             poligon.setOptions({
                 strokeColor: "white",
@@ -608,7 +609,7 @@ function yieldingLoop(count, chunksize, callback, finished) {
 }
 
 
-function attachPolygonInfoWindow(polygon,name) {
+function attachPolygonInfoWindow(polygon,name,id) {
     var infoWindow = new google.maps.InfoWindow();
     google.maps.event.addListener(polygon, 'mouseover', function (e) {
         infoWindow.setContent(name);
@@ -618,6 +619,9 @@ function attachPolygonInfoWindow(polygon,name) {
     });
     google.maps.event.addListener(polygon, 'mouseout', function (e) {
         infoWindow.close(map);
+    });
+    google.maps.event.addListener(polygon, 'click', function (e) {
+        console.log(id)
     });
 }
 
