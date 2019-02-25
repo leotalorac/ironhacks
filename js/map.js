@@ -307,7 +307,7 @@ function putPolygon(coords,parent){
         fillOpacity: 0.35,
         map
     });
-    attachPolygonInfoWindow(tempol,"District " + parent.id)
+    attachPolygonInfoWindow(tempol,"District " + parent.borocd)
     //saved on the data structure
     parent.poligs.push(tempol);
     //set the center of te poligon and saver 

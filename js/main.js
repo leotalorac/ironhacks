@@ -2,6 +2,7 @@
 //datasets
 const linkpoligons = "https://services5.arcgis.com/GfwWNkhOj9bNBqoJ/arcgis/rest/services/nycd/FeatureServer/0/query?where=1=1&outFields=*&outSR=4326&f=geojson"
 const linkrisk = "https://data.cityofnewyork.us/resource/9s4h-37hy.json?cmplnt_fr_dt=2015-12-31T00:00:00.000"
+const linkrisk2 = "https://data.cityofnewyork.us/resource/9s4h-37hy.json?$select=latitude%20as%20lat,longitude%20as%20lng&&$where=cmplnt_fr_dt=%222015-12-31T00:00:00.000%22"
 const linkaff = "https://data.cityofnewyork.us/api/views/hg8x-zxpr/rows.json?accessType=DOWNLOAD"
 const linknighthoods = "https://data.cityofnewyork.us/api/views/xyye-rtrs/rows.json?accessType=DOWNLOAD"
 //extra
@@ -38,7 +39,7 @@ var mappoligons = [];
 var mapmarkers = [];
 var colors = [ "#BD93FF", "#9954FF","#0097B2", "#FFE282", "#FFD546","#FFCE1A",  "#D1FFEB", "#7AFFBD","#1DFF93"];
 var discolors = ["#6900FF","#FF7400"];
-var riskcolors = ["#FFE300","#3000FF"];
+var riskcolors = ["#FFE300","#B400FF"];
 var affcolors =["#51FF00","#FF00F3"]
 var boros = ["Manhattan", "Brooklyn", "Queens", "Staten Island", "Bronx"]
 
@@ -105,7 +106,6 @@ async function getGeoData(url) {
                         nnighboors:0,
                         center:{},
                         distance:0,
-                        promaff:[],
                         promaffn:0,
                         type,
                         points:0, 
@@ -227,22 +227,20 @@ async function getRisk(url){
                 let riskdata = JSON.parse(data.responseText);
                 yieldingLoop(riskdata.length,10,(i)=>{
                     //get the coords of the crime 
-                    let coords = riskdata[i]["lat_lon"]["coordinates"]
-                    //create latlng object
-                    let jsoncoods = {"lat":coords[1],"lng":coords[0]};
+                    let jsoncoords = {"lat":parseFloat(riskdata[i]["lat"]),"lng":parseFloat(riskdata[i]["lng"])}
                     //add the crime to the data structure
                     for(j in districts){
                         districts[j]["poligs"].forEach((e)=>{
-                            if(isinPolygon(jsoncoods,e)){
+                            if(isinPolygon(jsoncoords,e)){
                                 //saved on the district
                                 districts[j].crimes++;
                             }
                         });
                     }
-                })
+                },() =>{console.log("risk ready");})
                     
                 //ready and go back
-                console.log("risk ready");
+                
                 youcan = true;
                 resolve("ready");
             });
@@ -259,34 +257,28 @@ async function getAffData(url){
         let data = $.get(url,()=>{console.log("getting affort data")})
             .done(()=>{
                 let affdata = JSON.parse(data.responseText);
-                // console.log(affdata.meta.view.columns);
+                //console.log(affdata.meta.view.columns);
                 affdata = affdata.data
                 console.log("start")
                 let sum,avg;
-                yieldingLoop(affdata.length,20,(i) =>{
+                yieldingLoop(affdata.length,25,(i) =>{
                     if(affdata[i][23] != null){
                         const jsoncoods = {"lat":parseFloat(affdata[i][23]),"lng":parseFloat(affdata[i][24])};
                         //calculate the ponderate average
-                        const total= affdata[i][31]+affdata[i][32]+affdata[i][33]+affdata[i][34]+affdata[i][35];
-                        const prom = (6*affdata[i][31] + 5*affdata[i][31]+4*affdata[i][32]+3*affdata[i][33]+2*affdata[i][34]+affdata[i][35])/total;
+                        const total= affdata[i][33]
                         //add the prom to the data structure
                         //console.log(prom)
                         for(j in districts){
                             districts[j]["poligs"].forEach((e)=>{
                                 if(isinPolygon(jsoncoods,e)){
                                     //saved on the district
-                                    districts[j].promaff.push(prom);
-                                    let arr = districts[j].promaff
-                                        sum = arr.reduce(function(a, b) { return a + b; });
-                                        avg = sum / arr.length;
-                                        districts[j].promaffn = avg
+                                    districts[j].promaffn += parseInt(total)
                                 }
                             });
                         }
                     }   
                 },()=>{
                     alert("enjoy the full experience")
-                    calculateProms();   
                     console.log("finish");
                 });                    
                 //calculateProms();
@@ -294,25 +286,6 @@ async function getAffData(url){
             });
     })
 }
-
-
-function calculateProms(){
-    for(j in districts){
-        let arr = districts[j].promaff
-        if(arr.length){
-            sum = arr.reduce(function(a, b) { 
-                if(!isNaN(a) && !isNaN(b)){
-                    return a + b; 
-                }else{
-                    return 0
-                }
-            });
-            avg = sum / arr.length;
-            districts[j].promaffn = avg
-        }
-    }
-}
-
 
 
 
@@ -429,10 +402,10 @@ function drawAff(value){
         let inten;
         if(value ===1){
             color = affcolors[0];
-            inten = d/2;
+            inten = 1-(d/4355);
         }else{
             color = affcolors[1];
-            inten = 1-d/2;
+            inten = (d/4355);
         }
         pol.forEach((poligon) => {
             poligon.setOptions({
@@ -464,9 +437,9 @@ function standartrisk(data,type){
 }
 function standartaff(data,type){
     if(type == "inverse"){
-        return (data/2)
+        return (1-(data/4355))
     }else{
-        return (1 - (data/2))
+        return (data/4355)
     }
 }
 
@@ -513,10 +486,10 @@ function filltable(){
     }).reverse();
     //console.log(sortable);
     table.html("")
-    for(let o=1;o<11;o++){
+    for(let o=0;o<11;o++){
         let dis = districts[sortable[o][0]]
         table.append(
-            "<tr><th scope='row'>" + o + "</th> <td>District " + sortable[o][0] + "</td> " + "<td>" + dis["dpoints"] + "</td>"+"<td>" + dis["rpoints"] + "</td>"+ "<td>" + dis["apoints"] + "</td>"+"<td>" + dis["points"] + "</td>"+"</tr>"
+            "<tr><th scope='row'>" + o + "</th> <td>District " + dis["borocd"] + "</td> " + "<td>" + dis["dpoints"] + "</td>"+"<td>" + dis["rpoints"] + "</td>"+ "<td>" + dis["apoints"] + "</td>"+"<td>" + dis["points"] + "</td>"+"</tr>"
         );
     }
     
@@ -662,7 +635,7 @@ $(document).ready(async () => {
     await getNightboors(linknighthoods);
     //calculate risk data and save it    
     progressbar("60%","Calculating risk data....")
-    getRisk(linkrisk);
+    getRisk(linkrisk2);
     progressbar("80%","Calculating affortable data....")
     getAffData(linkaff);
     progressbar("90%","Still calculating....")
