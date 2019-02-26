@@ -128,6 +128,40 @@ tablea{
   padding:1% 2% 2% 2%;
   border-radius: 1rem;
 }
+.graphichidden{
+  position: absolute;
+  display: flex;
+  height: 0;
+  width: 0;
+  top:  0;
+  left: 0;
+}
+.graphic{
+  position: absolute;
+  display: flex;
+  height: 60vh;
+  width: 70vw;
+  top:  20vh;
+  left: 20vw;
+  z-index: 5;
+  background-color: whitesmoke;
+  padding:1% 2% 2% 2%;
+  border-radius: 1rem;
+}
+.graphicd3{
+  width: 50%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.infocontainer{
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center
+}
 
 
 

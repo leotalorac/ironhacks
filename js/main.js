@@ -31,6 +31,9 @@ let table = $("#tablebody")
 let $holetable =$(".table")
 let youcan = false
 let csvbutton = $("#savecsv")
+let gf = $("#graphicfloat")
+let d3info = $("#put-info");
+let d3svg = $("#d3container")
 
 
 //-------------------------------map global variables-------------------
@@ -41,7 +44,7 @@ var colors = [ "#BD93FF", "#9954FF","#0097B2", "#FFE282", "#FFD546","#FFCE1A",  
 var discolors = ["#6900FF","#FF7400"];
 var riskcolors = ["#FFE300","#B400FF"];
 var affcolors =["#51FF00","#FF00F3"]
-var boros = ["Manhattan", "Brooklyn", "Queens", "Staten Island", "Bronx"]
+var boros = ["Manhattan","Bronx", "Brooklyn","Queens","Staten Island"]
 
 //--------------------------------front animations---------------------------
 //scroll down
@@ -261,7 +264,7 @@ async function getAffData(url){
                 affdata = affdata.data
                 console.log("start")
                 let sum,avg;
-                yieldingLoop(affdata.length,25,(i) =>{
+                yieldingLoop(affdata.length,15,(i) =>{
                     if(affdata[i][23] != null){
                         const jsoncoods = {"lat":parseFloat(affdata[i][23]),"lng":parseFloat(affdata[i][24])};
                         //calculate the ponderate average
@@ -607,7 +610,25 @@ function yieldingLoop(count, chunksize, callback, finished) {
         }
     })();
 }
-
+//-----------------------------------------polig actions---------------------------
+function drawgraphic(id){
+    let dis = districts[id];
+    gf.toggleClass("graphic");
+    gf.mouseleave(function(){
+        gf.removeClass("graphic");
+        gf.toggleClass("graphichidden");
+        d3info.html("")
+        d3svg.html("")
+    });
+    //put the info
+    d3info.append( "<h2>District "+ dis["borocd"]+"</h2>" );
+    d3info.append( "<h4>"+ boros[dis["boro"]]+"</h4>" );
+    d3info.append( "<p>Distance: "+ Math.round(parseFloat(dis["distance"])*6371000,1)+" m</p>" );
+    d3info.append( "<p>Crimes: "+ dis["crimes"]+"</p>" );
+    d3info.append( "<p>Affordable: "+ dis["promaffn"]+"</p>" );
+    d3info.append( "<p>Nighboors number: "+ dis["nnighboors"]+"</p>" );
+    draw(dis["rpoints"],dis["apoints"], dis["dpoints"]);
+}
 
 function attachPolygonInfoWindow(polygon,name,id) {
     var infoWindow = new google.maps.InfoWindow();
@@ -621,9 +642,14 @@ function attachPolygonInfoWindow(polygon,name,id) {
         infoWindow.close(map);
     });
     google.maps.event.addListener(polygon, 'click', function (e) {
-        console.log(id)
+        drawgraphic(id);
     });
 }
+
+
+
+
+
 
 //---------------------------------------start function----------------------------------
 
