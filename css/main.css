@@ -154,6 +154,8 @@ tablea{
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: 10%;
+  padding-left: 5%;
 }
 .infocontainer{
   width: 50%;

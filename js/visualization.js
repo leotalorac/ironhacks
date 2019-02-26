@@ -1,18 +1,18 @@
 function draw(risk, aff, dis) {
-    var w = 300, //width
-        h = 300, //height
-        r = 100, //radius
+    var w = 450, //width
+        h = 450, //height
+        r = 140, //radius
         color = d3.scale.category20c(); //builtin range of colors
     data = [{
-            "label": "Risk " + Math.round(risk),
+            "label": "Risk: \n" + Math.round(risk) + "pts",
             "value": risk
         },
         {
-            "label": "Affortable " + Math.round(aff),
+            "label": "Affortable: \n" + Math.round(aff) +"pts",
             "value": aff
         },
         {
-            "label": "Distance " + Math.round(dis),
+            "label": "Distance: \n" + Math.round(dis) +"pts",
             "value": dis
         }
     ];
@@ -23,7 +23,7 @@ function draw(risk, aff, dis) {
         .attr("width", w) //set the width and height of our visualization (these will be attributes of the <svg> tag
         .attr("height", h)
         .append("svg:g") //make a group to hold our pie chart
-        .attr("transform", "translate(" + r + "," + r + ")") //move the center of the pie chart from 0, 0 to radius, radius
+        .attr("transform", "translate(" + (r+10) + "," + r + ")") //move the center of the pie chart from 0, 0 to radius, radius
     var arc = d3.svg.arc() //this will create <path> elements for us using arc data
         .outerRadius(r);
     var pie = d3.layout.pie() //this will create arc data for us given a list of values
@@ -43,8 +43,8 @@ function draw(risk, aff, dis) {
     arcs.append("svg:text") //add a label to each slice
         .attr("transform", function (d) { //set the label's origin to the center of the arc
             //we have to make sure to set these before calling arc.centroid
-            d.innerRadius = 0;
-            d.outerRadius = r;
+            d.innerRadius = 30;
+            d.outerRadius = r+50;
             return "translate(" + arc.centroid(d) + ")"; //this gives us a pair of coordinates like [50, 50]
         })
         .attr("text-anchor", "middle") //center the text on it's origin
